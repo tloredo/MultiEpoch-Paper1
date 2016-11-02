@@ -634,10 +634,10 @@ We would like to find out the density of peaks of this field above a certain
 height. We will follow the procedure outlined in \citet{bbks}.
 
 We will expand the field and its gradient to second order around a peak at the 
-position $\rr_p$.
+position $\rr_p$:
 \begin{eqnarray}
 	f(\rr) = f(\rr_p)+\frac{1}{2} g_{ij}(\rr_p) (\rr-\rr_p)_i  (\rr-\rr_p)_j\\
-	h_i(\rr) = (\rr-\rr_p)_j g_{ij}(\rr_p)
+	h_i(\rr) = (\rr-\rr_p)_j g_{ij}(\rr_p),
 \end{eqnarray}
 where we already use the fact that the gradient of the field at a peak is zero, 
 i.e. $h_i(\rr_p)=0$. Provided that $g$ is non-singular at $\rr_p$, we can express 
@@ -696,15 +696,15 @@ of the correlation matrix as a product of two independent distributions
 	dP =\exp\left(-\frac{\vv^T C^{-1}\vv}{2}\right)
   			\frac{d^4 \vv} {(2\pi)^2|C|^{1/2}}
 		 \exp\left(-\frac{\hh^T H^{-1} \hh}{2}\right) 
-			\frac{d^2 \hh} {2\pi|H|^{1/2}}
+			\frac{d^2 \hh} {2\pi|H|^{1/2}}.
 \end{equation}
-Before we proceed further, the second derivative tensor can more conveniently
-described with the two eigenvalues $\lambda_1,\lambda_2$ and a rotation angle 
-$\phi$, as
+Before we proceed further, the second derivative tensor can be described more conveniently
+with the two eigenvalues $\lambda_1,\lambda_2$ and a rotation angle,
+$\phi$, as follows:
 \begin{eqnarray}
-	g_{11} =& \lambda_1 \cos^2\phi +\lambda_2 \sin^2\phi\\
-	g_{12} =& (\lambda_1-\lambda_2) \sin\phi \cos\phi\\
-	g_{22} =& \lambda_1 \sin^2\phi + \lambda_2 \cos^2\phi
+	g_{11} =& \lambda_1 \cos^2\phi +\lambda_2 \sin^2\phi,\\
+	g_{12} =& (\lambda_1-\lambda_2) \sin\phi \cos\phi,\\
+	g_{22} =& \lambda_1 \sin^2\phi + \lambda_2 \cos^2\phi.
 \end{eqnarray}
 For simplicity let us introduce the dimensionless variables 
 $x=(\lambda_1+\lambda_2)/\sigma_2$, the trace of the second derivative tensor, 
@@ -723,18 +723,18 @@ The quadratic form containing $\vv$ in the exponent can be written with the new
 variables as
 \begin{equation}
 	Q = v^T C^{-1} v = \left(
-		2 y^2	+\frac{x^2 + 2\gamma x z + z^2}{1-\gamma^2}\right)
+		2 y^2	+\frac{x^2 + 2\gamma x z + z^2}{1-\gamma^2}\right).
 \end{equation}
 The determinants of $C$ and $H$ are 
 \begin{equation}
 	|C| = \frac{1}{64}(1-\gamma^2)\sigma_0^2\sigma_2^6,\qquad
-	|H| = \frac{1}{4} \sigma_1^2
+	|H| = \frac{1}{4} \sigma_1^2.
 \end{equation}
 In these variables, the unconstrained probability distribution for 
 $(x,y,z,\phi)$ becomes
 \begin{equation}
 	dP = \frac{4y}{(2\pi)^2 \sqrt{1-\gamma^2}} \exp(-\frac{1}{2}Q) 
-		\,dx\ dy\ dz\ d\phi
+		\,dx\ dy\ dz\ d\phi.
 \end{equation}
 In order to properly handle the symmetries of the problem, we can assume that 
 $\lambda_1\geq\lambda_2$. Then still any $(\lambda_1,\lambda_2)$ pair can be 
@@ -745,7 +745,7 @@ over $\phi$, resulting in
 	dP =  
 		 \exp\left[-\frac{x^2 + 2\gamma x z + z^2}{2(1-\gamma^2)}\right] 
 			\frac{\,dx\ dz}{2\pi \sqrt{1-\gamma^2}}
-		\left( e^{-y^2}\,2y\ dy\right)
+		\left( e^{-y^2}\,2y\ dy\right).
 \end{equation}
 The constraint $\lambda_1>\lambda_2$ maps onto $0<y$. If we perform the 
 integration over $y>0$, and $x,z$ over $(-\infty,\infty)$, we get 1, as we 
@@ -757,18 +757,18 @@ is
 \begin{equation}
 	dw_x = \exp\left(-\frac{\hh^T H^{-1} \hh}{2}\right) 
 			|\det g| \delta^{(2)}[\hh]			
-			\frac{d^2 \hh} {2\pi|H|^{1/2}}
+			\frac{d^2 \hh} {2\pi|H|^{1/2}}.
 \end{equation}
 After integrating over $d^2\hh$ we get the extremum weight
 \begin{equation}
-	w_x = \frac{|\det g|}{2\pi|H|^{1/2}} =\frac{x^2-y^2}{4 \pi R^2}
+	w_x = \frac{|\det g|}{2\pi|H|^{1/2}} =\frac{x^2-y^2}{4 \pi R^2}.
 \end{equation}
 This will multiply the unconstrained probability for the density of extremal 
 points of the random field, 
 \begin{equation}
 		dn_{\rm{}pk}=\left[\frac{(x^2-y^2)y}{2\pi R^2} e^{-y^2}\,dy\right]
 		\exp\left[-\frac{x^2 + 2\gamma x z + z^2}{2(1-\gamma^2)}\right] 
-			\frac{\,dx\ dz}{2\pi \sqrt{1-\gamma^2}}
+			\frac{\,dx\ dz}{2\pi \sqrt{1-\gamma^2}}.
 \end{equation}
 For a peak both eigenvalues of the second derivative tensor must be negative. 
 In the rotated coordinates $(x,y)$, this means that $x<0$, and $0<y<-x$.
@@ -781,12 +781,12 @@ We are left with
 \begin{equation}
 	dn_{\rm{}pk} = \frac{(-1 + x^2 +e^{-x^2})}{4\pi R^2}  
 	\exp\left[-\frac{x^2 + 2 x z \gamma + z^2 }{2 (1-\gamma^2)}\right]
-	\frac{\,dx\ dz}{2\pi \sqrt{1-\gamma^2}}
+	\frac{\,dx\ dz}{2\pi \sqrt{1-\gamma^2}}.
 \end{equation}
 Let us introduce the function $B(x)$ as
 \begin{equation}
 	B(s,b) = \sqrt{\frac{\pi}{b}} \exp\left({\frac{s^2}{2b}}\right)
-	\left[1+ {\rm erf}\left( \frac{s}{\sqrt{2b}}\right)\right],
+	\left[1+ {\rm erf}\left( \frac{s}{\sqrt{2b}}\right)\right].
 \end{equation}
 Evaluating the integral over $-\infty<x\leq 0$ in Mathematica, we obtain
 \begin{equation}
@@ -795,12 +795,12 @@ Evaluating the integral over $-\infty<x\leq 0$ in Mathematica, we obtain
 		\frac{e^{-\frac{s^2}{2\gamma^2}}}{8\pi^2R^2}
 		\Bigg[
 			(1-\gamma^2)s +[s^2 - \gamma^2 (1 + s^2)] B(s,1)
-			+B(s, 3- 2\gamma^2)
+			+B(s, 3- 2\gamma^2),
 		\Bigg]
 \end{equation}
 with
 \begin{equation}
-	s = \frac{\gamma z}{\sqrt{1-\gamma^2}}
+	s = \frac{\gamma z}{\sqrt{1-\gamma^2}}.
 \end{equation}
 
 We need to evaluate the shape parameter $\gamma$. Assume that the window 
@@ -816,12 +816,12 @@ We model the sky noise as a white noise with a flat spectrum. Thus the
 correlations in the measured random field are determined by the window function,
 i.e.,
 \begin{equation}
-	P(k) = A\,|W(k)|^2 = A \exp\left(-k^2a^2\right)
+	P(k) = A\,|W(k)|^2 = A \exp\left(-k^2a^2\right).
 \end{equation}
-With this power spectrum it is trivial to compute the scale and the shape 
+With this power spectrum it is straightforward to compute the scale and the shape 
 parameters as
 \begin{equation}
-	\gamma^2 = \frac{1}{2}, \qquad R^2 = \frac{a^2}{2}
+	\gamma^2 = \frac{1}{2}, \qquad R^2 = \frac{a^2}{2}.
 \end{equation}
 
 
