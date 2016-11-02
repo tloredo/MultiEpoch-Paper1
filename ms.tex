@@ -154,8 +154,9 @@ To make the analysis analytically tractable and the results easy to interpret, w
 
 We adopt the terminology of LSST and other time-domain synoptic surveys, using \emph{source} to refer to single-epoch detection and measurement results, and \emph{object} to refer to a unique underlying physical system (e.g., a star or galaxy) that may be associated with one or more sources.
 (Here we limit ourselves to objects that would appear as a single source.)
-Let us consider an object with constant flux $f$ and direction $\drxn$ (a unit-norm vector on the sky). 
-Throughout the paper we consider observations in a single band unless stated otherwise.
+For simplicity, we consider observations in a single band unless stated otherwise.
+
+Consider an object with constant flux $f$ and direction $\drxn$ (a unit-norm vector on the sky). 
 At each epoch $\eind$, analysis of the image data $\edata$ corresponding to a small patch of sky of solid angle $\Omega$ produces a \emph{source likelihood function} (SLF) for the basic observables, flux $\flux$ and direction $\drxn$, of a candidate source in the patch.
 The SLF is the probability for the data as a function of the (uncertain) values of the observables,
 \begin{equation}
@@ -165,12 +166,12 @@ The SLF is the probability for the data as a function of the (uncertain) values 
 where $\ctxt$ denotes various contextual assumptions influencing the analysis,
 e.g., specification of the photometric model and information about instrumental and sky backgrounds.
 (Since $\ctxt$ is common to all subsequent probabilities, we henceforth consider it as implicitly present.)
-For example, if photometry is done via point spread function (PSF) fitting with weighted least squares, and if the noise level and backgrounds are known, then to a good approximation $\like_\eind(\flux,\drxn) \propto \exp[-\chi^2(\flux, \drxn)/2]$, where $\chi^2(\flux, \drxn)$ is the familiar sum of squared weighted residuals as a function of the source flux and direction.
+For example, if photometry is done via point spread function (PSF) fitting with weighted least squares, and if the noise level and backgrounds are known, then it may be a good approximation to take $\like_\eind(\flux,\drxn) \propto \exp[-\chi^2(\flux, \drxn)/2]$, where $\chi^2(\flux, \drxn)$ is the familiar sum of squared weighted residuals as a function of the source flux and direction.
 
 
 We consider a catalog at a given epoch to report summaries of the likelihood functions for candidate sources that have met some detection criteria.
 The most commonly reported summaries are best-fit fluxes (or magnitudes) with a quantification of flux uncertainty (typically a standard error or the half-width of a 68\% confidence region), and, separately, best-fit sky coordinates with an uncertainty for each coordinate.%
-\footnote{Cautionary note about the meaning of ``best-fit'' here.}
+%***\footnote{Cautionary note about the meaning of ``best-fit'' here.}
 We here take these summaries to correspond to a factored approximation of the source likelihood function,
 \begin{align} \label{eq:eplike}
 \like_\eind(\flux, \drxn)
@@ -178,7 +179,7 @@ We here take these summaries to correspond to a factored approximation of the so
   &= \flike_\eind(\flux)\, \dlike_\eind(\drxn),
 \end{align}
 where the epoch-specific flux factor, $\flike_\eind(\flux)$, is a Gaussian with mode $\fest_\eind$ (the catalog flux estimate at epoch $\eind$) and standard deviation $\fsig_\eind$, and the direction factor, $\dlike_\eind(\drxn)$, is an azimuthally symmetric bivariate Gaussian with mode $\dest_\eind$, and standard deviation $\dsig_\eind$.
-This may be a rather crude approximation; we discuss it further in \S~\ref{sec:caveats}.
+This may be a rather crude approximation; we will address it further elsewhere, here merely noting that it is implicitly adopted for most survey catalogs.
 For simplicity, we take the flux factors to have the same standard deviation at all epochs,  $\fsig_\eind = \sigma$.
 \enote{Define the direction uncertainty, too.}
 
@@ -191,9 +192,9 @@ For simplicity, we take the flux factors to have the same standard deviation at 
 %We here adopt the simple criterion that $\hat{\flux}_\eind$ be greater than a fixed threshold, $\fth$, common across all epochs.
 
 
-We adopt a simple source detection criterion: a candidate source with a source likelihood mode $\fest$ larger than a threshold value, $\fth$, is deemed a detection.
-The probability for detection in a single-epoch catalog is just the integral of the Gaussian likelihood function above the threshold. 
-In other words, the probability of the event that \mbox{$\flux_\eind>\fth$} is
+We adopt a simple source detection criterion: a candidate source with a flux likelihood mode $\fest$ larger than a single-epoch threshold value, $\fth$, is deemed a detection.
+The probability for detection in a single-epoch catalog is the probability that source with true flux $f$ will produce a single-epoch measurement $\fest_\eind$ that falls above the threshold.
+This probability is just the integral of the Gaussian flux likelihood function above the threshold, which we denote by
 %
 \begin{equation}\label{eq:pf}
 P_f \defeq P(>\!\fth|f) = \frac{1}{2}\,\erfc\left(\frac{\fth\!-\!f}{\sigma\sqrt{2}}\right),
@@ -201,21 +202,22 @@ P_f \defeq P(>\!\fth|f) = \frac{1}{2}\,\erfc\left(\frac{\fth\!-\!f}{\sigma\sqrt{
 %
 where $\erfc(\cdot)$ is the complementary error function.
  
-For comparison, next we look at detection probabilities in the case of stacked exposures.
-Let us combine $k$ observations.
-We assume that our objects are stationary and have a constant flux, and the dominant source of the noise is still the sky, thus the relative noise is reduced by $\sqrt{k}$ after stacking.
-For a stacked exposure flux threshold $f_S$, the probability for detection is now
+For comparison, consider detection probabilities in the case of stacked exposures from $k$ observations.
+We assume that the objects are stationary and have a constant flux, and that the dominant source of noise is still the sky, so the relative noise is reduced by $\sqrt{k}$ after stacking.
+For a stacked exposure flux threshold $f_S$, the probability for detection is
 %
 \begin{equation}
-P'_f = \frac{1}{2}\,\erfc\left(\frac{f_S\!-\!f}{\sigma\sqrt{2/k}}\right).
+P'_f \defeq \frac{1}{2}\,\erfc\left(\frac{f_S\!-\!f}{\sigma\sqrt{2/k}}\right).
 \end{equation}
 %
-Figure~\ref{fig:1} illustrates the detection probabilities in the different cases.
+Figure~\ref{fig:1} displays the detection probability as a function of true object flux for single-epoch and stacked data, for various choices of the single-epoch and stacked thresholds.
 The dotted green lines represent the single-exposure situation $P_f$ as a function of the true flux in $\sigma$ units for detection thresholds of 2, 3, 4, and 5$\sigma$.
 Similarly the solid yellow lines correspond to the stacked detections with \mbox{$k\!=\!9$} exposures.
+
 Consider two curves corresponding to the same threshold, so $f_S = \fth$.
-The probability for detection at $\fth$ is 50\% for both a single exposure and stacked exposures.
+The probability for detection at $f=\fth$ is 50\% for both a single exposure and stacked exposures.
 But the curve for stacked exposures is much steeper, with a higher probability for detecting sources brighter than $\fth$, and a lower probability for detecting sources dimmer than $\fth$.
+That is, when constructed with a common threshold, the catalog built from stacked data will be more complete above threshold, and will more effectively exclude sources with true flux below threshold.
 
 
 
@@ -233,22 +235,23 @@ But the curve for stacked exposures is much steeper, with a higher probability f
 %
 Faint sources will not always be detected.
 %
-The probability of $n$ detections out of \mbox{$k=n+m$} observations follows the binomial distribution, giving the multi-epoch detection probability,
+The probability for making $n$ detections among \mbox{$k=n+m$} observations follows the binomial distribution, giving the multi-epoch detection probability,
 %
 \begin{equation} \label{eq:binomial}
  P(n|k,f) = {k \choose n}\ P_f^n\,\big(1\!-\!P_f\big)^{k-n}.
 \end{equation}
 %
-It is interesting to look at the probability that an object would lead to source detections in $n_0$ or more observations.
+An interesting quantity is the probability that an object would lead to source detections in $n_0$ or more observations.
 This is simply the sum
 \begin{equation}
 P(n\!\geq{}\!n_0|k,f) = \sum_{n=n_0}^k {k \choose n}\ P_f^n\,\big(1\!-\!P_f\big)^{k-n}
 \end{equation}
 %
 (this can be expressed in terms of the incomplete beta function).
-In Figure~\ref{fig:2} we plot these curves for \mbox{$k$=9} observations.
-From left to right, the solid red curves show the probability for detection of an object of given flux in exactly 1, 2, etc., up to 9 observations.
+In Figure~\ref{fig:2} we plot these probabilities as a function of $f$ (again in $\sigma$ units) for \mbox{$k$=9} observations.
+From left to right, the solid red curves show the probability for detecting an object of given flux in exactly 1, 2, etc., up to 9 observations.
 Similarly the dashed blue curves correspond to cases $1+$ (1 or more), $2+$, and so on.
+(Note that the functions coincide for the case $n=n_0=k=9$.)
 
 \begin{figure}
 \epsscale{1.2}
@@ -258,11 +261,12 @@ Similarly the dashed blue curves correspond to cases $1+$ (1 or more), $2+$, and
 \end{figure}
 
 
-Figure~\ref{fig:3} compares detection probability curves for the stacked exposure case (as in Figure~\ref{fig:1}) and the multi-epoch, multiple detection case (as in Figure~\ref{fig:2}).
+Figure~\ref{fig:3} compares detection probability curves for the stacked exposure case (solid yellow curves, as in Figure~\ref{fig:1}) and the multi-epoch, $n>n_0$ detection case (dashed blue curves, as in Figure~\ref{fig:2}).
 For a particular stacked exposure case, we see there is a multi-epoch case whose detection probability curve displays very similar performance.
 For example, the $3\sigma$ stacked exposure curve is very similar to the multi-epoch $5+$ detection case.
-This indicates that collecting sources with $5+$ detections from \emph{single-epoch} $3\sigma$ catalogs is nearly equivalent to producing a separate, new $3\sigma$ stacked exposure catalog.
+This indicates that collecting sources with $5+$ detections from \emph{single-epoch} $3\sigma$ catalogs is nearly equivalent in terms of catalog completeness and purity to producing a separate, new $3\sigma$ stacked exposure catalog.
 %
+\enote{Move the rest to intro?}
 Analyzing the single-epoch catalogs has a number of advantages.
 It can be implemented in an incremental fashion that follows the schedule of the survey and the time-series is readily available at a given time; there is no need to go back to old images and to performed forced photometry at locations that are revealed in the stacks only.
 
@@ -275,9 +279,10 @@ It can be implemented in an incremental fashion that follows the schedule of the
 
 
 %================================================================================
-\section{Finding the Real Sources}
+\section{Distinguishing Real Sources from Noise Peaks}
 \noindent
 %
+The previous calculations addressed detectability of a source of known true flux, $f$.
 In real-life scenarios, the problem is quite the opposite---we are presented with the observations and would like to understand the properties of the sources. 
 In this context, our focus is on how one can reliably distinguish noise peaks from real sources. 
 It is important to emphasize that we have more information than just the fact that a source has been detected; we also have flux measurements. 
