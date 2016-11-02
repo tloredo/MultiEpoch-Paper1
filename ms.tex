@@ -120,20 +120,26 @@ We show that the probabilistic cross-matching underlying our approach plays an i
 \label{sec:intro}
 \noindent
 %
-In the era of time-domain survey astronomy, dedicated telescopes scan the sky every night and strategically revisit the same area several times. 
-The question we wish to address in this paper is how to combine information from a sequence of independent observations to maximize the ability to detect faint objects at or near a chosen detection threshold, ameliorating the data explosion due to false detections from a lower threshold that would be required by a suboptimal method.
+In the era of time-domain survey astronomy, dedicated telescopes scan the sky every night and strategically revisit the same area several times.
+The raw data are images, but surveys commonly provide, not only image data, but also \emph{catalogs}, summaries of the image data that aim to enable a wide variety of studies without requiring users to analyze raw or processed image data.
+Catalogs typically report object properties, based on algorithms that detect sources in images with a measure of statistical significance above some threshold, chosen so that the resulting catalog is likely to be highly pure (i.e., with few or no spurious sources).
+ 
+The question we address in this paper is how to combine information from a sequence of independent observations to maximize the ability to detect faint objects at or near a chosen detection threshold, ameliorating the data explosion due to false detections from a lower threshold that would be required by a suboptimal method.
 Focusing on the faint objects that typically dominate the collected data is an important and timely problem for a number of ongoing surveys and vital for planning the next-generation data processing pipelines.
 
 There are two different ways one can approach the problem. 
-A resource-intensive approach is to wait until all observations are completed, performing detection by stacking the full image data.
+A traditional, resource-intensive approach is to wait until all observations are completed, performing detection by stacking the multi-epoch image data.
 An optimal procedure for threshold-based detection with image stacks was introduced by \citet{chisq}.
 Once a master object catalog is produced from the stacked images, time-series of source measurements are created by forced photometry at the master catalog locations.
-%
-The other, not exclusive alternative is to perform object detection after each observation, producing a catalog of candidate sources at each epoch.
-A final object catalog is produced by analysis of the series of overlapping source detections potentially associated with a single object. 
-The detection threshold can be different for each observation. 
-If we set the threshold too high, there will be too few detections, and we will not have a well-sampled time series. 
-If, on the other hand, we set the threshold too low, the catalogs will be overwhelmed with (mostly false) detections that were seen only once.
+
+An alternative (non-exclusive) approach is to perform source detection independently for each observation, producing a catalog of candidate sources at each epoch.
+The detection threshold may be different for each epoch. 
+Interim object catalogs may be produced by analysis of the series of overlapping source detections potentially associated with a single object using any available data; a final catalog would be built using the catalogs from all epochs.
+Of course, a catalog based on data from many epochs should be able to include many dim sources that escape confident detection in single-epoch or few-epoch catalogs.
+To enable construction of a deep multi-epoch catalog, the single-epoch catalogs must report information for candidate sources with relatively low statistical significance; i.e., the single-epoch catalogs must have reduced purity.
+If we set the single-epoch threshold too high, there will be too few detections; we will not have well-sampled time series for dim sources, and the final catalog will be too small.
+If, on the other hand, we set the threshold too low, the single-epoch catalogs will be overwhelmed with (mostly false) detections that were seen only once, requiring wasteful expenditure of storage and computing resources for constructing multi-epoch catalogs.
+An optimal threshold might preserve the size and quality of the final catalog, while enabling users to build interim catalogs on-the-fly, potentially tailored to specific, evolving needs.
 
 We here address the second alternative, considering how best to use the list of detections while the observations are in progress to prune spurious source detections but keep the sources associated with genuine objects.
 
