@@ -515,9 +515,17 @@ A simple algorithm is to pick a large enough square, with area $\Omega$, and ran
 Out of these ghosts, we pick a number equal to the number of flux detections, with locations such that are closest to the center, where the simulated object is placed.
 
 Figure~\ref{fig:bf2} shows the distribution of Bayes factors, for the real (mock) and noise sources, now including the astrometric cross-matching factor.
-Banding due to discreteness in the number of detections is now clearly apparent; the 9 levels correspond to the different number of detections with the lowest being 1.
+Banding due to discreteness in the number of detections is now clearly apparent among the true-object Bayes factors; the 9 levels correspond to the different number of detections with the lowest being 1.
+For the lowest band, corresponding to a single detection, $B_{\rm{}pos}$ is unity by definition (no constraint coming from a single detection), producing the same Bayes factor distribution as in the flux-only calculation.
+For multiple detections, the Bayes factors for the true sources are greatly enhanced by including astrometric information (note that the ordinate is logarithmic); just two detections produces quite strong evidence for the true-object hypothesis.
 The Bayes factors for the noise peaks have moved to much lower values, due to the low likelihood of directional coincidences.
-For the lowest band, corresponding to a single detectin, $B_{\rm{}pos}$ is unity by definition (no constraint coming from a single detection), producing the same Bayes factor distribution as in the flux-only calculation.
+
+This computation demonstrates that flux and astrometric catalog data, combined across epochs, can strongly distinguish real objects from spurious detections.
+We have not addressed what threshold Bayes factor to use for producing a multi-epoch catalog, or, in Bayesian terms, how to convert Bayes factors into posterior probabilities for candidate objects.
+As noted above, when the object population density (on the sky and in flux) is known a priori, the calculation is straightforward (e.g., the prior odds will be proportional to the ratio of true object and noise peak sky densities).
+When these quantities are unknown, a possibly complicated hierarchical Bayesian calculation can jointly estimate them and the object properties.
+When many objects are detected, an approximate approach, plugging in empirical estimates of the densities based on the data, is likely to suffice, as described in \cite{REF,REF}.
+\enote{SCMA5 refs?}
 
 
 %****************************************
