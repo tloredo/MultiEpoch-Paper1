@@ -285,11 +285,14 @@ It can be implemented in an incremental fashion that follows the schedule of the
 The previous calculations addressed detectability of a source of known true flux, $f$.
 In real-life scenarios, the problem is quite the opposite---we are presented with the observations and would like to understand the properties of the sources. 
 In this context, our focus is on how one can reliably distinguish noise peaks from real sources. 
-It is important to emphasize that we have more information than just the fact that a source has been detected; we also have flux measurements. 
+It is important to emphasize that we have more information than just the fact that a source has been detected; we also have flux measurements, at multiple epochs. 
 Our approach is motivated by Bayesian hypothesis testing, where the strength of evidence for presence of a source is quantified by the posterior probability for the source-present hypothesis, or equivalently, by the posterior odds in favor of a source being present vs.\ being absent (the odds is the ratio of probabilities for the rival hypotheses).
 The posterior odds is the product of prior odds and the data-dependent \emph{Bayes factor}.
 The prior odds depends on population properties; it may be specified a priori when there is sufficient knowledge of the population under study, or learned adaptively by using hierarchical Bayesian methods (for examples of this in the related context of cross-identification, see REF).
+\enote{Get SCMA5 ref.}
 Here we focus on the Bayes factor; we will address hierarchical modeling in a follow-up paper.
+
+\enote{Should ``source'' be ``object'' here?}
 
 The Bayes factor is the ratio of marginal likelihoods for the competing hypotheses, one that claims that the source is real, and its complement that assumes just noise:
 %
@@ -297,8 +300,10 @@ The Bayes factor is the ratio of marginal likelihoods for the competing hypothes
 B = \frac{\mlike_{\rm{}real}}{\mlike_{\rm{}noise}} .
 \end{equation}
 %
-(Recall that a marginal likelihood is the integral, with respect to all free parameters for the hypothesis, of the product of the likelihood function and the prior probability density for the parameters.)
-Let us now assume that out of $k$ observations, we measure $n$ detections with fluxes $\{f_\eind\}$. We consider the two competing scenarios separately.
+Each marginal likelihood, $\mlike_{\rm{}hyp}$, is the integral, with respect to all free parameters for the hypothesis, of the product of the likelihood function and the prior probability density for the parameters.
+
+Let us now assume that out of $k$ observations, we measure $n$ detections with measured fluxes $\{\fest_\eind\}$.
+We consider the two competing hypotheses separately.
 
 %--------------------------------------------------------------------------------
 \subsection{Real-source hypothesis}
@@ -306,8 +311,8 @@ Let us now assume that out of $k$ observations, we measure $n$ detections with f
 Let $\dtxn$ denote the set of indices for epochs with detections, and $\ndtxn$ denote the set of indices for epochs with nondetections:
 \begin{equation}
 \begin{split}
-\dtxn  &\equiv \{\eind : \flux_\eind > \fth\},\\
-\ndtxn &\equiv \{\eind : \flux_\eind \le \fth\}.
+\dtxn  &\equiv \{\eind : \fest_\eind > \fth\},\\
+\ndtxn &\equiv \{\eind : \fest_\eind \le \fth\}.
 \end{split}
 \label{D-ND-sets}
 \end{equation}
@@ -317,16 +322,17 @@ For a candidate source with $n$ detections among $k$ catalogs, the likelihood fo
 \like(f) = (1\!-\!P_f)^{k-n}\,\prod_{\eind \in \dtxn} \flike_\eind(\flux),
 \end{equation}
 %
-where \mbox{$(1\!-\!P_f)$} is the probability of not detecting an object with true flux $f$, which happens \mbox{$(k\!-\!n)$} times, and $\flike_\eind(\cdot)$ is the Gaussian flux likelihood function defined above.
+where \mbox{$(1\!-\!P_f)$} is the probability of not detecting an object with true flux $f$, which happens \mbox{$(k\!-\!n)$} times, and $\flike_\eind(\cdot)$ is the flux likelihood function defined above (Gaussians with means equal to $\fest_\eind$).
 %
-The marginal likelihood that the data indeed correspond to a real source is obtained from averaging over all possible $f$ flux values. 
-If $\pi(f)$ represents the true distribution of the fluxes, the result is
+The marginal likelihood for the real-source hypothesis is obtained by averaging over all possible true flux values, $f$.
+For a source that is a member of a population with known flux probability density $\pi(f)$, the prior probability for $f$, used for the averaging in the marginal likelihood, is $\pi(f)$, so that
 %
 \begin{equation}
 \mlike_{\rm{}real} = \int\!\!df\,\pi(f)\,L(f)
 \end{equation}
 %
 which is a one-dimensional integral that can be analytically or numerically quickly evaluated.
+(When the population distribution is not known a priori, it may be estimated via joint analysis of the catalog data for many candidate sources, within a hierarchical model, a significant complication that we will elaborate on elsewhere.)
 
 
 %--------------------------------------------------------------------------------
@@ -336,9 +342,13 @@ which is a one-dimensional integral that can be analytically or numerically quic
 The alternative hypothesis is that the detections are simply random noise peaks in the image.
 The noise hypothesis marginal likelihood, $\mlike_{\rm noise}$, is the probability for the catalog data presuming no real source is present.\footnote{We are presuming the use of a fixed source detection algorithm, e.g., fixed apertures. 
 If the algorithm is adaptive, its tuning parameters need to be accounted for in this probability.}
-For epochs with a candidate source reported in the catalog, the data is the flux estimate, $\fest_\eind$, and the relevant factor in the marginal likelihood is $\npd(\fest_\eind) \defeq p(\fest_\eind|\rm{Noise})$, the \emph{noise peak distribution}, evaluated at $\fest_\eind$.
-This distribution will depend on the noise statistics for each catalog; here it depends only on $\sigma$.
-For epochs with no reported detection, we instead know only that $\fest_\eind \le \fth$, so the relevant factor is
+
+For epochs with a candidate source reported in the catalog, the datum is the flux measurement, $\fest_\eind$, and the relevant factor in the marginal likelihood is $\npd(\fest_\eind) \defeq p(\fest_\eind|\rm{Noise})$, the \emph{noise peak distribution}, evaluated at $\fest_\eind$.
+This distribution will depend on the noise statistics for each catalog.
+
+For epochs with no reported detection, we instead know only that $\fest_\eind \le \fth$, so the relevant factor is the fraction of \emph{missed} noise peaks,%
+\footnote{The integral is over possible \emph{measured} flux values, $\fest_\eind$, not true flux; in the Gaussian regime assumed here the measured value may be negative, albeit with small probability.
+The estimated flux would be constrained to be positive via the prior density, $\pi(f)$, which would multiply the flux likelihood when computing posterior flux estimates.}
 \begin{equation} \label{eq:Q-noise}
 Q_N \defeq \int_{-\infty}^{\fth}\!\!d\fest\,\npd(\fest).
 \end{equation}
@@ -351,7 +361,7 @@ Typically, a source finder performs a scan, identifying local peaks of the measu
 Under the noise hypothesis, the source finder will be finding peaks of a smooth random field.
 The locations and amplitudes of the peaks will form a point process, whose statistical properties can be analytically calculated \citep{adler,bbks,bond,kaiser}.
 %
-The most important consequence is that even though the underlying noise at the pixel level may be independent and Gaussian, the source finder produces a point process with a more complicated distribution of fluxes.
+The most important consequence is that even though the underlying noise at the pixel level may be independent and Gaussian, the source finder output will correspond to sampling from a point process with a more complicated distribution of fluxes.
 In particular, although the pixel-level noise distributions are symmetric (about the mean background), the distribution for (falsely) detected fluxes is skewed toward positive values.
 %
 The relevant calculation is presented in the Appendix.
@@ -371,9 +381,11 @@ The shaded (magenta) area highlights the excess density over the Gaussian at neg
 
 As noted above, we obtain the probability for detecting a noise peak, $P_N$, by integrating $\npd(\fest)$ above the flux threshold.
 %
-Figure~\ref{fig:frac}a shows the results as a function of the flux threshold (left) as well as an LSST-like magnitude (right). We see that the fraction is about 62\% at 1$\sigma$ dropping quickly to about a few percent at 3$\sigma$ and is essentially negligible at 5$\sigma$.
+Figure~\ref{fig:frac}a shows the results as a function of the flux threshold in $\sigma$ units (left), and on a scale corresponding to an LSST-like magnitude (right).
+\enote{We should specify how the LSST magnitude scale was set, or point to a REF.}
+We see that the fraction of noise peaks above threshold is about 62\% at 1$\sigma$, dropping quickly to about a few percent at 3$\sigma$, and becoming negligible at 5$\sigma$.
 %
-Based on just this figure, it is tempting to set a high detection threshold to reject such ``ghost peaks'' and keep the catalog of detections nearly pure; but that would mean we loose the opportunity to recover the really faint sources. 
+Based on just this figure, it is tempting to set a high detection threshold to reject such ``ghost peaks'' and keep the catalog of detections nearly pure; but that would mean we lose the opportunity to recover the numerous really faint sources. 
 
 \begin{figure*}
 \epsscale{1.2}
@@ -393,13 +405,13 @@ Our multi-epoch approach suggests a different strategy: instead of seeking to ma
 The marginal likelihood and Bayes factor computations accomplish this data fusion.
 
 %For a specific detection threshold we can calculate the noise peak detection probability $P_N$ as described above; e.g., 1$\sigma$ yields \mbox{$P_{N}\!\simeq\!0.62$}. 
-The marginal likelihood is a product of the terms for the detections and non-detections:
+The marginal likelihood for the noise hypothesis is a product of the terms for the detections and non-detections:
 %
 \begin{equation}
 \mlike_{\rm noise} = \left(1\!-\!P_N\right)^{k-n}\,\prod_{\eind \in \dtxn} \npd(\fest_\eind).
 \end{equation}
 %
-We now have all the ingredients for computing the Bayes factor of Eq.~\ref{eq:Bfac}, providing an objective measure of how much the data prefer one model over the other. 
+We now have all the ingredients for computing the Bayes factor of Eq.~\ref{eq:Bfac}, providing an objective measure of how much the data prefer a real-source origin to a noise peak origin. 
 
 
 %--------------------------------------------------------------------------------
@@ -408,25 +420,27 @@ We now have all the ingredients for computing the Bayes factor of Eq.~\ref{eq:Bf
 \noindent
 So far we have only used the flux information in the data. 
 Genuine sources should have both consistent fluxes and consistent directions across all epochs.
-In practice, due to the noise and astrometric errors, the detections of the same object will shift in each exposure, thus the resulting catalogs first have to be cross-matched. 
-Using a probabilistic method can be to our direct benefit here.
+In practice, due to the noise and astrometric errors, the detections of the same object will shift in each exposure, thus the resulting catalogs have to be cross-matched. 
+Using a probabilistic method can be to our direct benefit here, enabling straightforward combination of the flux and direction information.
 %%
 %Bayesian cross-identification \citep{pxid} compares the marginal likelihood of the hypothesis that all detections of a set belong to the same source against the marginal likelihood under the opposite assumption.
 %%
 %Every candidate association is assigned a Bayes factor $B_{\rm{}pos}$ based on the celestial positions of its detections.
 
-The detections from a real source are all connected, they are just displaced by a random astrometric error, but noise peaks (ghosts) will be independent of each other and their associations can only be by chance.
+The detections from a real source are all connected, they are just displaced by a random astrometric error; but noise peaks (ghosts) will be independent of each other and their associations can only be by chance.
 As we are working under the approximation that the flux and sky position estimates are independent (see Eq.~\ref{eq:eplike}), the Bayes factor using both the photometric and astrometric information factors,
 %
 \begin{equation}
 B_{\rm{}flux,pos} = B_{\rm{}flux}\cdot{}B_{\rm{}pos}.
 \end{equation}
 %
-The astrometric cross-match Bayes factor, $B_{\rm{}pos}$, has been derived in \ref{XX} (see Eq.~(17) there, and Eq.~(19) for the high-precision, tangent plane Gaussian limit).
+\enote{Find REF.}
+The astrometric cross-match Bayes factor, $B_{\rm{}pos}$, has been derived in \ref{XX} (see Eq.~(17) there, and Eq.~(19) for the tangent plane Gaussian limit that holds for high-precision astrometry).
 That work also discusses generalizations that account for proper motion and other complications.
 
 In the following section we assess the discriminative power of multi-epoch source detection by applying it to simulated galaxies and noise peaks, both omitting and including the astrometric data.
 
+\enote{It might be interesting to show astrometry-only results. They might correspond to allowing for arbitrary variability, so that no flux matching is expected at all. Use of variability models would then produce results between the pure astrometry and astrometry $+$ flux cases.}
 
 
 %================================================================================
@@ -440,20 +454,20 @@ In the following section we assess the discriminative power of multi-epoch sourc
 
 \noindent
 We here use simulations to demonstrate the detection capability of our multi-epoch approach in a setting with known ground truth.
-The simulation parameters were chosen to produce data similar to that provided in modern large-scale optical surveys.
+The simulation parameters were chosen to produce data similar to that provided by modern large-scale optical surveys.
 
 
 %--------------------------------------------------------------------------------
 \subsection{Simulated Galaxies}
 \noindent
-We assume that galaxies are brighter than 28 magnitudes and the 5$\sigma$ detection limit is 24 magnitudes, corresponding roughly to parameters of LSST photometry.
+We assume that galaxies are brighter than 28 magnitudes and that the 5$\sigma$ detection limit is 24 magnitudes, corresponding roughly to parameters of LSST photometry.
 %
-Panel~(b) of Figure~\ref{fig:frac} shows the fraction of noise peak detection probability as a function of magnitude with these parameters, in contrast to the dimensionless presentation in panel~(a).
+Panel~(b) of Figure~\ref{fig:frac} shows the noise peak detection probability as a function of magnitude based on these parameters, in contrast to the dimensionless presentation in panel~(a).
 %
 To compute the marginal likelihood for the source-present hypothesis, we must specify a prior for the source flux, $\flux$.
 Here we use a standard faint-galaxy number counts law,
 with the number counts following the empirical formula of 
-\mbox{$dN\!\propto\!10^{0.4m}dm$}; see \citep{MT00-NumCounts}. 
+\mbox{$dN\!\propto\!10^{0.4m}dm$}; see \cite{MT00-NumCounts}. 
 That approximately translates to the properly normalized population distribution of
 %
 \begin{equation} 
@@ -464,43 +478,50 @@ That approximately translates to the properly normalized population distribution
            \\ \end{array} \right.
 \end{equation}
 %
-where $f_L$ is the limiting flux that corresponds to previously defined magnitude limit.
+where $f_L$ is the limiting flux that corresponds to the previously defined magnitude limit.
 
 %\subsection{The Mock Catalogs}\label{sec:mock} \noindent
 We generate sets of random detections for 20,000 galaxies with true fluxes between 28 and 23 magnitudes by simply drawing $\fest_\eind$ values from a Gaussian centered on the actual fluxes.
 %
-We also generate 2,000 ghost detection $\fest_\eind$ values from $\npd(\fest)$ by inverting the cumulative distribution (computed numerically on a grid).
+We also generate 2,000 ghost detection $\fest_\eind$ values from $\npd(\fest)$ by inverting its cumulative distribution (computed numerically on a grid).
 %
 The number of exposures is set to the previously used $k=9$ with a flux threshold of just 1$\sigma$, deep in the noise.
 In observations with our specified parameters, the number of ghost detections will greatly outnumber the galaxy detections with this low threshold.
-The numbers of galaxies and ghosts were chosen to be able to display the distributions of Bayes factors for the two classes of detections.
+The numbers of galaxies and ghosts were chosen to enable display of the distributions of Bayes factors for the two classes of detections (noise and true).
 
 We first analyze the simulated data considering only the photometric information (i.e., ignoring the directional Bayes factors).
 In Figure~\ref{fig:bf} the (red) points represent the resulting Bayes factors for the real sources (right of the double dashed vertical lines) and the noise peaks (on the left).
 %
-We see that the weight of evidence is strong for the bright galaxies but weakens for the faint galaxies.
+The weight of evidence is strong for the bright galaxies but weakens for the faint galaxies.
 The smallest Bayes factors arise for galaxies with true magnitudes near 26.5, which corresponds to the mode of the noise peak distribution, $\npd(\fest)$.
-Perhaps surprisingly, sources dimmer than magnitude 26.5 may have larger Bayes factors than those with magnitude 26.5.
+Perhaps surprisingly, sources dimmer than magnitude 26.5 can have larger Bayes factors than those with magnitude 26.5.
 This happens because $\npd(\fest)$ peaks away from $\fest=0$, i.e., we do not expect noise peaks to have arbitrarily small measured fluxes.
-For the weakest detectable sources, the most likely number of detections among the $k=9$ is one.
+For the weakest detectable sources, the most likely number of detections among the $k=9$ epochs is one.
 The flat top of the distribution at the faint end corresponds to very dim sources detected only once, very near threshold.
-The smaller Bayes factors in that region of the plot correspond to unlikely larger numbers of detections near the threshold; this produces a subtle banding in the distribution.
+The smaller Bayes factors in that region of the plot correspond to unlikely larger numbers of detections near the threshold; the discreteness in the number of detections produces a subtle banding in the distribution.
 
-%****************************************
-\color{red}
+
+
 We now additionally consider the astrometric data.
-Assuming a constant direction  uncertainty of $0.1\arcsec$ for all detections, we simulate the coordinates for the mock sources. Around the true direction of the object, we randomly generate points from a 2D Gaussian. The flat sky approximation is excellent: for such tight scatters, the systematic error is below the limit of the numerical representation of double precision floating point numbers.
+Assuming a constant direction  uncertainty of $0.1\arcsec$ for all detections, we simulate the coordinates for the mock galaxies.
+Around the true direction of each object, we randomly generate points from a 2D Gaussian.
+This flat sky approximation is excellent in this regime; for such tight scatters, the approximation error is below the limit of the numerical representation of double precision floating point numbers.
 
 The coordinates of noise peaks are generated homogeneously.
 %
 The surface density of the ghosts is analytically calculated and its integral above the 1$\sigma$ detection threshold yields \mbox{$\nu\!=\!0.04/\square\arcsec$}.
 %
-A simple algorithm is to pick a large enough square, with area $\Omega$, and randomly draw the number of peaks from a Poisson distribution with expectation value $\lambda=\nu\Omega$. Out of these ghosts, we pick as many as the number of flux detections such that they are closest to the center, where the simulated object is placed.
+A simple algorithm is to pick a large enough square, with area $\Omega$, and randomly draw the number of peaks from a Poisson distribution with expectation value $\lambda=\nu\Omega$.
+Out of these ghosts, we pick a number equal to the number of flux detections, with locations such that are closest to the center, where the simulated object is placed.
 
-Figure~\ref{fig:bf2} shows the results. The quantized nature of the plot is due to the strong evidence coming from more and more matching detection, while the noise peaks scatter to lower values. The 9 levels correspond to the different number of detections with the lowest being 1, where $B_{\rm{}pos}$ is unity by definition (no constraint coming from a single detection), which leaves the previous results untouched.
+Figure~\ref{fig:bf2} shows the distribution of Bayes factors, for the real (mock) and noise sources, now including the astrometric cross-matching factor.
+Banding due to discreteness in the number of detections is now clearly apparent; the 9 levels correspond to the different number of detections with the lowest being 1.
+The Bayes factors for the noise peaks have moved to much lower values, due to the low likelihood of directional coincidences.
+For the lowest band, corresponding to a single detectin, $B_{\rm{}pos}$ is unity by definition (no constraint coming from a single detection), producing the same Bayes factor distribution as in the flux-only calculation.
 
 
-
+%****************************************
+\color{red}
 \begin{figure}
 \epsscale{1.2}
 \plotone{fig/f7u-U.png}
