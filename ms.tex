@@ -86,7 +86,7 @@
 %================================================================================
 \begin{document}
 
-\title{Faint Object Detection in Multi-Epoch Observations}
+\title{Incremental Faint Object Detection in Multi-Epoch Observations}
 %\journalinfo{To appear in ApJ?}
 \journalinfo{Submitted to Apj}
 
@@ -142,14 +142,15 @@ If, on the other hand, we set the threshold too low, the single-epoch catalogs w
 An optimal threshold might preserve the size and quality of the final catalog, while enabling users to build interim catalogs on-the-fly, potentially tailored to specific, evolving needs.
 
 We here address the second alternative, considering how best to use the list of detections while the observations are in progress to prune spurious source detections but keep the sources associated with genuine objects.
-
+The study presented here is exploratory, to establish the basic ideas and provide initial metrics for studying the feasibility of the incremental approach.
+To make the analysis analytically tractable and the results easy to interpret, we restrict ourselves to an idealized setting; we will present a more general treatment in a subsequent paper.
 
 %================================================================================
 \section{Detection Probabilities} 
 \label{sec:det}
 
 \noindent 
-To make the analysis analytically tractable and the results easy to interpret, we here restrict ourselves to an idealized setting; we will present a more general treatment in a subsequent paper.
+
 
 We adopt the terminology of LSST and other time-domain synoptic surveys, using \emph{source} to refer to single-epoch detection and measurement results, and \emph{object} to refer to a unique underlying physical system (e.g., a star or galaxy) that may be associated with one or more sources.
 (Here we limit ourselves to objects that would appear as a single source.)
