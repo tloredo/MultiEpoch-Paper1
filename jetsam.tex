@@ -32,7 +32,6 @@ In confused fields this can be further extended to include the possiblity of mul
 
 
 
-
 \iffalse
 \begin{figure}
 \epsscale{1.2}
@@ -41,4 +40,59 @@ In confused fields this can be further extended to include the possiblity of mul
 \label{fig:bfx}
 \end{figure}
 \fi
+
+
+
+%--------------------------------------------------------------------------------
+\subsection{Variable Objects}
+\label{sec:var}
+\noindent
+While the analysis here considered only sources with constant brightness, the methodology is expected to perform well on variables. If the brightening is a one-time transient such as a supernova, the significance comes from the measured flux providing enough evidence for keeping the detections.
+%
+If, on the other hand, the variables are repeatedly detected, the cross-identification term will quickly grow to high values. The details of such algorithms will need to be optimized with the observation cadence and the expected frequency of these sources, hence here we just provide the general mathematical formulas.
+%
+A model that describes the evolution of the flux is parameterized by some $\theta$ variables, such that $g(t;\theta)$ provides the prediction of the true flux as a function of time. Examples include models for supernova lightcurves empirical or theoretical \citep{riess95,snana}. The $\pi(\theta)$ distribution is either known apriori or can be inferred simultaneously in a 2-level hierarchical model.
+%
+Let $i$ index the epochs at which we detect the $f_i$ fluxes, and $j$ reprensent the remaining $m$ exposures where nothing is seen.
+%
+Similarly to the constant flux model we can formulate the likelihood function that will also depend on the epochs now. The probability of detecting a variable object at $t_j$ time having
+\mbox{$g_j(\theta)\equiv{}g(t_j;\theta)$} flux is the integral above the threshold, $P_{g_j(\theta)}$, cf.\ Eq.(\ref{eq:pf}), and the likelihood of  $\theta$ is
+%
+\begin{equation}
+L(\theta) = \prod_j^{k-n} \left[1\!-\!P_{g_j(\theta)}\right]\,\prod_i^n G\big(f_i;g_i(\theta),\sigma^2\big)
+\end{equation}
+%
+The likehood of the hypothesis is given by marginalizing over all parameters,
+%
+\begin{equation}
+L_{\rm{}var} = \int{}\!\!d\theta\,\pi(\theta)\,L(\theta)
+\end{equation}
+%
+which can be compared to the noise or constant flux hypotheses.
+%
+We note that the latter is a special case of this generalization.
+If we simply assume that there is no time-dependence and \mbox{$g(t;\theta)\!=\!\theta$} then we get the same formulas with \mbox{$\theta\!\equiv{}\!f$}.
+
+Periodic objects fall in a special case where time is folded onto a fix interval, say between 0 and 1. With $\omega$ frequency and $\phi$ phase broken out from the general $\theta$ parameters, i.e., \mbox{$\theta\!=\!(\omega,\phi,\theta')$}, the time-dependence has the specific form of
+%
+\begin{equation}
+g(t;\omega,\phi,\theta') = h(x;\theta')
+\end{equation}
+with
+\begin{equation}
+x = \frac{ (\omega{}t+\phi)\,{\rm{}mod}\,{2\pi} }{2\pi}
+\end{equation}
+%
+where $h(\cdot)$ describes the shape of the periodic signal, parameterized by $\theta'$, which repeats indefinitely.
+%
+For example, \citet{gregory} approximate the shape with piecewise constants in $m$ bins, where $m$ is also a variable, and develop an elegant method for detecting periodic signals.
+%
+They discuss the invariance argument that formally yields the priors
+\begin{eqnarray}
+\pi(\phi) & = & 1 \big/ 2\pi \\
+\pi(\omega)& \propto & 1 \big/ \omega
+\end{eqnarray}
+on the new parameters.
+%
+The non-uniform prior on the frequency can be shown to be the natural choice that is also form-invariant with respect to re-parametrization in terms of the period; see \citet{gregory} and references therein.
 
