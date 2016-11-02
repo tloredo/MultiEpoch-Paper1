@@ -1,0 +1,879 @@
+%\documentclass[preprint,12pt]{aastex}
+\documentclass[twocolumn]{emulateapj}
+%\usepackage{apjfonts}
+\usepackage{color}
+\usepackage{amsmath}
+
+\newcommand{\apjvec}[1]{\mbox{\boldmath{$#1$}}}
+\newcommand{\apjmat}[1]{{\mathbf{#1}}}
+
+\renewcommand{\theenumi}{\roman{enumi}.}
+\renewcommand{\labelenumi}{\theenumi}
+
+\newcommand{\vx}{\apjvec{x}}
+\newcommand{\vf}{\apjvec{f}}
+\newcommand{\vxi}{\apjvec{\xi}}
+\newcommand{\vt}{\apjvec{\theta}}
+%\newcommand{\mf}{\apjmat{F}}
+\newcommand{\snIa}{\mbox{SN\,{\sc{}i}a}}
+
+\newcommand{\erfc}{{\rm{}erfc}}
+
+
+\newcommand{\rr}{\mathbf{r}}
+\newcommand{\hh}{\mathbf{h}}
+\newcommand{\vv}{\mathbf{v}}
+\newcommand{\ww}{\mathbf{w}}
+\newcommand\avg[1]{\langle{#1}\rangle}
+
+\newcommand*{\defeq}{\stackrel{\text{def}}{=}}
+
+% % % % % % % % % % %
+% Macros added by TL:
+
+% Misc symbols:
+\newcommand{\scond}[1]{\qquad||\;{#1}}  % Skilling conditional
+\newcommand{\ctxt}{\mathcal{C}}  % context/background information
+
+% Data and likelihoods:
+\newcommand{\eind}{\epsilon}  % epoch index
+\newcommand{\edata}{D_\eind}  % epoch-specific image data
+\newcommand{\like}{\mathcal{L}}  % generic likelihood
+\newcommand{\slf}{\mathcal{L}}  % source likelihood
+\newcommand{\flike}{\ell}  % flux likelihood factor
+\newcommand{\dlike}{m}  % drxn likelihood factor
+\newcommand{\mlike}{\mathcal{M}}  % marginal likelihood
+
+% Source properties & characteristics:
+%\newcommand{\schar}{\chi}  % source characteristics (to "characterize" a source)
+%\newcommand{\sobs}{\mathcal{O}}  % source observables
+\newcommand{\flux}{f}
+\newcommand{\fest}{\hat{\flux}}  % flux estimate
+\newcommand{\fsig}{\sigma}  % flux uncertainty
+\newcommand{\drxn}{\mathbf{n}}
+\newcommand{\dest}{\hat{\mathbf{n}}}  % drxn estimate
+\newcommand{\dsig}{\delta}  % drxn uncertainty
+
+% Detection, nondetection:
+\newcommand{\dtxn}{\mathcal{D}}  % detection
+\newcommand{\ndtxn}{\mathcal{N}}  % non-detection
+\newcommand{\accept}{\mathcal{A}}  % set of detection data
+\newcommand{\fth}{\flux_{\rm th}}
+
+\newcommand{\npd}{\nu}  % noise peak dist'n
+
+% Macro for an "editorial note"; uncomment the 2nd definition to
+% produce a version without notes (put it in main doc if desired).
+\newcommand\enote[1]{ %
+\marginpar[\raggedleft\large $\blacktriangleright$]%
+{\raggedright\large $\blacktriangleleft$} %
+{\large $\langle\langle\langle$}{\sl #1}{\large  $\rangle\rangle\rangle$} %
+}
+%\renewcommand\enote[1]{\relax}
+
+% Marginal note (just a redef of \marginpar or \marginparodd).
+% Uncomment the 2nd definition to produce a version without notes (put it 
+% in main doc if desired).
+% Could use \footnotesize for a bigger font.
+% The \hspace enables hyphenation of the 1st word.
+\setlength{\marginparwidth}{.7in}
+\newcommand\mnote[1]{\-\marginpar[\raggedleft\tiny\hspace*{0pt}#1]%
+{\raggedright\tiny\hspace*{0pt}#1}}
+%\renewcommand\mnote[1]{\relax}
+
+% % % % % % % % % % %
+
+%================================================================================
+\begin{document}
+
+\title{Faint Object Detection in Time-Domain Observations}
+\journalinfo{To appear in ApJ?}
+%\journalinfo{Submitted to Apj}
+
+\author{ Tam\'{a}s Budav\'{a}ri, Alexander S.\ Szalay}
+\affil{Dept.\ of Physics and Astronomy, The Johns Hopkins University, 3400 North Charles Street, Baltimore, MD 21218}
+\and
+\author{Thomas J. Loredo}
+\affil{Center for Radiophysics and Space Research, Cornell University, Ithaca, NY 14853}
+
+\shortauthors{}
+\shorttitle{}
+
+
+\begin{abstract} 
+Observational astronomy in the time-domain era faces several new challenges. 
+One of them is the efficient use of observations at multiple epochs. 
+The work presented here addresses faint object detection, and seeks to find an incremental strategy for separating real objects from artifacts in ongoing surveys, in situations where the available data are summaries of the full image data, such as source flux and direction estimates (with uncertainties) reported in catalogs.
+We adopt a Bayesian approach, addressing object detection by calculating the probabilities for hypotheses asserting there is no object, or one object, in a small image patch containing at most one detected source at each epoch.
+The object-present hypothesis interprets the sources in a patch as arising from a genuine object; the no-object hypothesis interprets any detected sources as spurious, arising from noise peaks.
+We study the detection probability of constant-flux objects in a simplified Gaussian noise setting, comparing results from based on single exposures and stacks to results based on catalog summary data.
+We find that probabilistic fusion of multi-epoch catalog information can detect sources with only modest sacrifice in sensitivity.
+In the setting studied here, the detection probability factors into terms accounting for matching of the estimated fluxes of candidate sources, and accounting for matching of their estimated directions (i.e., directional cross-matching across catalogs).
+We show that the probabilistic cross-matching underlying our approach plays an important role in maintaining detection sensitivity.
+\end{abstract}
+
+\keywords{methods: statistical --- surveys --- catalogs --- photometry --- astrometry}
+
+
+%================================================================================
+\section{Introduction}
+\label{sec:intro}
+\noindent
+%
+In the era of time-domain survey astronomy, dedicated telescopes scan the sky every night and strategically revisit the same area several times. 
+The question we wish to address in this paper is how to combine information from a sequence of independent observations to maximize the ability to detect faint objects at or near a chosen detection threshold, ameliorating the data explosion due to false detections from a lower threshold that would be required by a suboptimal method.
+Focusing on the faint objects that typically dominate the collected data is an important and timely problem for a number of ongoing surveys and vital for planning the next-generation data processing pipelines.
+
+There are two different ways one can approach the problem. 
+A resource-intensive approach is to wait until all observations are completed, performing detection by stacking the full image data.
+An optimal procedure for threshold-based detection with image stacks was introduced by \citet{chisq}.
+Once a master object catalog is produced from the stacked images, time-series of source measurements are created by forced photometry at the master catalog locations.
+%
+The other, not exclusive alternative is to perform object detection after each observation, producing a catalog of candidate sources at each epoch.
+A final object catalog is produced by analysis of the series of overlapping source detections potentially associated with a single object. 
+The detection threshold can be different for each observation. 
+If we set the threshold too high, there will be too few detections, and we will not have a well-sampled time series. 
+If, on the other hand, we set the threshold too low, the catalogs will be overwhelmed with (mostly false) detections that were seen only once.
+
+We here address the second alternative, considering how best to use the list of detections while the observations are in progress to prune spurious source detections but keep the sources associated with genuine objects.
+
+
+%================================================================================
+\section{Detection Probabilities} 
+\label{sec:det}
+
+\noindent 
+To make the analysis analytically tractable and the results easy to interpret, we here restrict ourselves to an idealized setting; we will present a more general treatment in a subsequent paper.
+
+We adopt the terminology of LSST and other time-domain synoptic surveys, using \emph{source} to refer to single-epoch detection and measurement results, and \emph{object} to refer to a unique underlying physical system (e.g., a star or galaxy) that may be associated with one or more sources.
+(Here we limit ourselves to objects that would appear as a single source.)
+Let us consider an object with constant flux $f$ and direction $\drxn$ (a unit-norm vector on the sky). 
+Throughout the paper we consider observations in a single band unless stated otherwise.
+At each epoch $\eind$, analysis of the image data $\edata$ corresponding to a small patch of sky of solid angle $\Omega$ produces a \emph{source likelihood function} (SLF) for the basic observables, flux $\flux$ and direction $\drxn$, of a candidate source in the patch.
+The SLF is the probability for the data as a function of the (uncertain) values of the observables,
+\begin{equation}
+\like_\eind(\flux,\drxn) \equiv p(\edata|\flux,\drxn,\ctxt),
+\label{like-def}
+\end{equation}
+where $\ctxt$ denotes various contextual assumptions influencing the analysis,
+e.g., specification of the photometric model and information about instrumental and sky backgrounds.
+(Since $\ctxt$ is common to all subsequent probabilities, we henceforth consider it as implicitly present.)
+For example, if photometry is done via point spread function (PSF) fitting with weighted least squares, and if the noise level and backgrounds are known, then to a good approximation $\like_\eind(\flux,\drxn) \propto \exp[-\chi^2(\flux, \drxn)/2]$, where $\chi^2(\flux, \drxn)$ is the familiar sum of squared weighted residuals as a function of the source flux and direction.
+
+
+We consider a catalog at a given epoch to report summaries of the likelihood functions for candidate sources that have met some detection criteria.
+The most commonly reported summaries are best-fit fluxes (or magnitudes) with a quantification of flux uncertainty (typically a standard error or the half-width of a 68\% confidence region), and, separately, best-fit sky coordinates with an uncertainty for each coordinate.%
+\footnote{Cautionary note about the meaning of ``best-fit'' here.}
+We here take these summaries to correspond to a factored approximation of the source likelihood function,
+\begin{align} \label{eq:eplike}
+\like_\eind(\flux, \drxn)
+  &\equiv p(\edata|\flux, \drxn, H_1)\nonumber\\
+  &= \flike_\eind(\flux)\, \dlike_\eind(\drxn),
+\end{align}
+where the epoch-specific flux factor, $\flike_\eind(\flux)$, is a Gaussian with mode $\fest_\eind$ (the catalog flux estimate at epoch $\eind$) and standard deviation $\fsig_\eind$, and the direction factor, $\dlike_\eind(\drxn)$, is an azimuthally symmetric bivariate Gaussian with mode $\dest_\eind$, and standard deviation $\dsig_\eind$.
+This may be a rather crude approximation; we discuss it further in \S~\ref{sec:caveats}.
+For simplicity, we take the flux factors to have the same standard deviation at all epochs,  $\fsig_\eind = \sigma$.
+\enote{Define the direction uncertainty, too.}
+
+% These symbols unused?
+
+%Let $\dtxn_\eind$ denote a proposition asserting that a candidate source was detected in the patch at epoch $\eind$, i.e., that $\edata$ passes detection criteria.\footnote{We are assuming that detection is deterministic, i.e., given the full data $\edata$, detection is a yes-no proposition.}
+%$\dtxn_\eind$ may be expressed more explicitly as $\edata \in \accept_\eind$, asserting that the data from epoch $\eind$ lie in the acceptance set, $\accept_\eind$, the possible values of $D_\eind$ classified as corresponding to a detected source.
+%Let  $\ndtxn_\eind$ denote the proposition stating that no candidate source was detected in the patch at epoch $\eind$.
+%Equivalently, we may write $D_\eind\notin \accept_\eind$.
+%We here adopt the simple criterion that $\hat{\flux}_\eind$ be greater than a fixed threshold, $\fth$, common across all epochs.
+
+
+We adopt a simple source detection criterion: a candidate source with a source likelihood mode $\fest$ larger than a threshold value, $\fth$, is deemed a detection.
+The probability for detection in a single-epoch catalog is just the integral of the Gaussian likelihood function above the threshold. 
+In other words, the probability of the event that \mbox{$\flux_\eind>\fth$} is
+%
+\begin{equation}\label{eq:pf}
+P_f \defeq P(>\!\fth|f) = \frac{1}{2}\,\erfc\left(\frac{\fth\!-\!f}{\sigma\sqrt{2}}\right),
+\end{equation}
+%
+where $\erfc(\cdot)$ is the complementary error function.
+ 
+For comparison, next we look at detection probabilities in the case of stacked exposures.
+Let us combine $k$ observations.
+We assume that our objects are stationary and have a constant flux, and the dominant source of the noise is still the sky, thus the relative noise is reduced by $\sqrt{k}$ after stacking.
+For a stacked exposure flux threshold $f_S$, the probability for detection is now
+%
+\begin{equation}
+P'_f = \frac{1}{2}\,\erfc\left(\frac{f_S\!-\!f}{\sigma\sqrt{2/k}}\right).
+\end{equation}
+%
+Figure~\ref{fig:1} illustrates the detection probabilities in the different cases.
+The dotted green lines represent the single-exposure situation $P_f$ as a function of the true flux in $\sigma$ units for detection thresholds of 2, 3, 4, and 5$\sigma$.
+Similarly the solid yellow lines correspond to the stacked detections with \mbox{$k\!=\!9$} exposures.
+Consider two curves corresponding to the same threshold, so $f_S = \fth$.
+The probability for detection at $\fth$ is 50\% for both a single exposure and stacked exposures.
+But the curve for stacked exposures is much steeper, with a higher probability for detecting sources brighter than $\fth$, and a lower probability for detecting sources dimmer than $\fth$.
+
+
+
+\begin{figure}
+\epsscale{1.2}
+\plotone{fig/f1.png}
+\caption{The detection probability is shown in different scenarios as a function of the true flux in $\sigma$ units. The green dotted lines illustrate single-exposure cases with different thresholds that take values of 2, 3, 4, and 5$\sigma$ ({\it{}from left to right}). The yellow solid lines are the same for stacks with \mbox{$k\!=\!9$} observations, at the same flux thresholds.}
+\label{fig:1}
+\end{figure}
+
+
+%--------------------------------------------------------------------------------
+\subsection{Multiple detections and non-detections}
+\noindent
+%
+Faint sources will not always be detected.
+%
+The probability of $n$ detections out of \mbox{$k=n+m$} observations follows the binomial distribution, giving the multi-epoch detection probability,
+%
+\begin{equation} \label{eq:binomial}
+ P(n|k,f) = {k \choose n}\ P_f^n\,\big(1\!-\!P_f\big)^{k-n}.
+\end{equation}
+%
+It is interesting to look at the probability that an object would lead to source detections in $n_0$ or more observations.
+This is simply the sum
+\begin{equation}
+P(n\!\geq{}\!n_0|k,f) = \sum_{n=n_0}^k {k \choose n}\ P_f^n\,\big(1\!-\!P_f\big)^{k-n}
+\end{equation}
+%
+(this can be expressed in terms of the incomplete beta function).
+In Figure~\ref{fig:2} we plot these curves for \mbox{$k$=9} observations.
+From left to right, the solid red curves show the probability for detection of an object of given flux in exactly 1, 2, etc., up to 9 observations.
+Similarly the dashed blue curves correspond to cases $1+$ (1 or more), $2+$, and so on.
+
+\begin{figure}
+\epsscale{1.2}
+\plotone{fig/f2.png}
+\caption{The detection probability in multiple observations is shown here as function of the true flux. Assuming \mbox{$k\!=\!9$} total available observations, the {\it{}solid red curves} show the probability of the object appearing in exactly 1, 2, 3, etc., up to 9 observations ({\it{}from left to right}). Similarly, the {\it{}dashed blue lines} correspond to the 1+, i.e., 1 or more, 2+, 3+, etc., cases.}
+\label{fig:2}
+\end{figure}
+
+
+Figure~\ref{fig:3} compares detection probability curves for the stacked exposure case (as in Figure~\ref{fig:1}) and the multi-epoch, multiple detection case (as in Figure~\ref{fig:2}).
+For a particular stacked exposure case, we see there is a multi-epoch case whose detection probability curve displays very similar performance.
+For example, the $3\sigma$ stacked exposure curve is very similar to the multi-epoch $5+$ detection case.
+This indicates that collecting sources with $5+$ detections from \emph{single-epoch} $3\sigma$ catalogs is nearly equivalent to producing a separate, new $3\sigma$ stacked exposure catalog.
+%
+Analyzing the single-epoch catalogs has a number of advantages.
+It can be implemented in an incremental fashion that follows the schedule of the survey and the time-series is readily available at a given time; there is no need to go back to old images and to performed forced photometry at locations that are revealed in the stacks only.
+
+\begin{figure}[t]
+\epsscale{1.2}
+\plotone{fig/f3.png}
+\caption{The comparison of the probabilities plotted previously in Figures~\ref{fig:1} and \ref{fig:2} reveals the similarities of the alternative methods. The curves of the stacked cases ({\it{}solid yellow lines}) and the summed up binomials ({\it{}dashed blue lines}) follow similar trends in the usual regime of parameter space. In particular, we highlight the remarkable agreement of the 3$\sigma$ curve for the stack detections ({\it{}solid yellow line second from the left}) and the 5+ sum of the binomials ({\it{}dashed blue in the middle}).}
+\label{fig:3}
+\end{figure}
+
+
+%================================================================================
+\section{Finding the Real Sources}
+\noindent
+%
+In real-life scenarios, the problem is quite the opposite---we are presented with the observations and would like to understand the properties of the sources. 
+In this context, our focus is on how one can reliably distinguish noise peaks from real sources. 
+It is important to emphasize that we have more information than just the fact that a source has been detected; we also have flux measurements. 
+Our approach is motivated by Bayesian hypothesis testing, where the strength of evidence for presence of a source is quantified by the posterior probability for the source-present hypothesis, or equivalently, by the posterior odds in favor of a source being present vs.\ being absent (the odds is the ratio of probabilities for the rival hypotheses).
+The posterior odds is the product of prior odds and the data-dependent \emph{Bayes factor}.
+The prior odds depends on population properties; it may be specified a priori when there is sufficient knowledge of the population under study, or learned adaptively by using hierarchical Bayesian methods (for examples of this in the related context of cross-identification, see REF).
+Here we focus on the Bayes factor; we will address hierarchical modeling in a follow-up paper.
+
+The Bayes factor is the ratio of marginal likelihoods for the competing hypotheses, one that claims that the source is real, and its complement that assumes just noise:
+%
+\begin{equation} \label{eq:Bfac}
+B = \frac{\mlike_{\rm{}real}}{\mlike_{\rm{}noise}} .
+\end{equation}
+%
+(Recall that a marginal likelihood is the integral, with respect to all free parameters for the hypothesis, of the product of the likelihood function and the prior probability density for the parameters.)
+Let us now assume that out of $k$ observations, we measure $n$ detections with fluxes $\{f_\eind\}$. We consider the two competing scenarios separately.
+
+%--------------------------------------------------------------------------------
+\subsection{Real-source hypothesis}
+\noindent
+Let $\dtxn$ denote the set of indices for epochs with detections, and $\ndtxn$ denote the set of indices for epochs with nondetections:
+\begin{equation}
+\begin{split}
+\dtxn  &\equiv \{\eind : \flux_\eind > \fth\},\\
+\ndtxn &\equiv \{\eind : \flux_\eind \le \fth\}.
+\end{split}
+\label{D-ND-sets}
+\end{equation}
+For a candidate source with $n$ detections among $k$ catalogs, the likelihood for a candidate true flux $f$ is
+%
+\begin{equation}
+\like(f) = (1\!-\!P_f)^{k-n}\,\prod_{\eind \in \dtxn} \flike_\eind(\flux),
+\end{equation}
+%
+where \mbox{$(1\!-\!P_f)$} is the probability of not detecting an object with true flux $f$, which happens \mbox{$(k\!-\!n)$} times, and $\flike_\eind(\cdot)$ is the Gaussian flux likelihood function defined above.
+%
+The marginal likelihood that the data indeed correspond to a real source is obtained from averaging over all possible $f$ flux values. 
+If $\pi(f)$ represents the true distribution of the fluxes, the result is
+%
+\begin{equation}
+\mlike_{\rm{}real} = \int\!\!df\,\pi(f)\,L(f)
+\end{equation}
+%
+which is a one-dimensional integral that can be analytically or numerically quickly evaluated.
+
+
+%--------------------------------------------------------------------------------
+\subsection{Noise peak hypothesis}\label{sec:peaks}
+\noindent
+%
+The alternative hypothesis is that the detections are simply random noise peaks in the image.
+The noise hypothesis marginal likelihood, $\mlike_{\rm noise}$, is the probability for the catalog data presuming no real source is present.\footnote{We are presuming the use of a fixed source detection algorithm, e.g., fixed apertures. 
+If the algorithm is adaptive, its tuning parameters need to be accounted for in this probability.}
+For epochs with a candidate source reported in the catalog, the data is the flux estimate, $\fest_\eind$, and the relevant factor in the marginal likelihood is $\npd(\fest_\eind) \defeq p(\fest_\eind|\rm{Noise})$, the \emph{noise peak distribution}, evaluated at $\fest_\eind$.
+This distribution will depend on the noise statistics for each catalog; here it depends only on $\sigma$.
+For epochs with no reported detection, we instead know only that $\fest_\eind \le \fth$, so the relevant factor is
+\begin{equation} \label{eq:Q-noise}
+Q_N \defeq \int_{-\infty}^{\fth}\!\!d\fest\,\npd(\fest).
+\end{equation}
+The probability for a false detection is then $P_N = 1 - Q_N$.
+
+To compute these quantities comprising $\mlike_{\rm noise}$, we need to know the noise peak distribution, $\npd(\fest)$.
+This distribution is not trivial to specify; it will depend both on the noise sources, and on the source detection algorithm.
+%
+Typically, a source finder performs a scan, identifying local peaks of the measured fluxes smoothed with a kernel, e.g., corresponding to a specified point source aperture.
+Under the noise hypothesis, the source finder will be finding peaks of a smooth random field.
+The locations and amplitudes of the peaks will form a point process, whose statistical properties can be analytically calculated \citep{adler,bbks,bond,kaiser}.
+%
+The most important consequence is that even though the underlying noise at the pixel level may be independent and Gaussian, the source finder produces a point process with a more complicated distribution of fluxes.
+In particular, although the pixel-level noise distributions are symmetric (about the mean background), the distribution for (falsely) detected fluxes is skewed toward positive values.
+%
+The relevant calculation is presented in the Appendix.
+
+Figure~\ref{fig:surface} shows the surface density of noise peaks as a function of the detection statistic $\fest$ (in $\sigma$ units), in the scenario when the sky noise is spatially independent and Gaussian.
+The surface density is in units of objects per $a^2$, where $a$ is the width of the point spread function (see Appendix).
+The noise peak distribution is the normalized version of this function.
+The surface density has a mode at $\fest \approx 1.33\sigma$ and its shape is well approximated with a Gaussian with standard deviation $\approx 0.835$ for all positive values of $\fest$. 
+The shaded (magenta) area highlights the excess density over the Gaussian at negative $\fest$ values.
+
+\begin{figure}
+\epsscale{1.2}
+\plotone{fig/f4.png}
+\caption{The thick (magenta) curve illustrates the surface density of noise peaks as a function of flux in the scenario when the sky noise is white, i.e., has a flat spectrum. The mode of the distribution is at around 1.33$\sigma$ (vertical line) and its shape is well approximated with a Gaussian (thin gray line) for all positive fluxes. The excess density over the Gaussian at negative flux values is shaded (magenta) for clarity.}
+\label{fig:surface}
+\end{figure}
+
+As noted above, we obtain the probability for detecting a noise peak, $P_N$, by integrating $\npd(\fest)$ above the flux threshold.
+%
+Figure~\ref{fig:frac}a shows the results as a function of the flux threshold (left) as well as an LSST-like magnitude (right). We see that the fraction is about 62\% at 1$\sigma$ dropping quickly to about a few percent at 3$\sigma$ and is essentially negligible at 5$\sigma$.
+%
+Based on just this figure, it is tempting to set a high detection threshold to reject such ``ghost peaks'' and keep the catalog of detections nearly pure; but that would mean we loose the opportunity to recover the really faint sources. 
+
+\begin{figure*}
+\epsscale{1.2}
+\plotone{fig/f5.png}
+\caption{The fraction of detected noise peaks drops quickly by raising the threshold. At 1$\sigma$ the value is about 62\% but at 3$\sigma$ it is only a few percent and at 5$\sigma$, which is 24 magnitudes in this case, the detected fraction is negligible. Naively this makes it highly desirable to put a harder constraint on the detection limit but then the opportunity is lost to track fainter sources. The right solution is not this shortcut.}
+\label{fig:frac}
+\end{figure*}
+
+%\begin{figure*}
+%\epsscale{1.2}
+%\plotone{fig/f6.png}
+%\caption{Panels (a)-(d) show the distribution of noise peaks and galaxies as a function of flux and magnitude using linear and logarithmic scales. The solid (magenta) line shows the distribution of the noise peaks, which is the normalized version of the curve in Figure~\ref{fig:surface}. For comparison, the dotted (green) Gaussian represents the distribution of measurements in randomly placed apertures. The dashed (black) line illustrates the \mbox{$1/f^2$} galaxy distribution used in this study.}
+%\label{fig:distr}
+%\end{figure*}
+
+Our multi-epoch approach suggests a different strategy: instead of seeking to make the catalogs for \emph{each} epoch pure, we can adopt a lower single-epoch threshold, relying on the fusion of data across epochs to weed out ghosts.
+The marginal likelihood and Bayes factor computations accomplish this data fusion.
+
+%For a specific detection threshold we can calculate the noise peak detection probability $P_N$ as described above; e.g., 1$\sigma$ yields \mbox{$P_{N}\!\simeq\!0.62$}. 
+The marginal likelihood is a product of the terms for the detections and non-detections:
+%
+\begin{equation}
+\mlike_{\rm noise} = \left(1\!-\!P_N\right)^{k-n}\,\prod_{\eind \in \dtxn} \npd(\fest_\eind).
+\end{equation}
+%
+We now have all the ingredients for computing the Bayes factor of Eq.~\ref{eq:Bfac}, providing an objective measure of how much the data prefer one model over the other. 
+
+
+%--------------------------------------------------------------------------------
+\subsection{Displacements: Including the Astrometry}
+\label{sec:astrom}
+\noindent
+So far we have only used the flux information in the data. 
+Genuine sources should have both consistent fluxes and consistent directions across all epochs.
+In practice, due to the noise and astrometric errors, the detections of the same object will shift in each exposure, thus the resulting catalogs first have to be cross-matched. 
+Using a probabilistic method can be to our direct benefit here.
+%%
+%Bayesian cross-identification \citep{pxid} compares the marginal likelihood of the hypothesis that all detections of a set belong to the same source against the marginal likelihood under the opposite assumption.
+%%
+%Every candidate association is assigned a Bayes factor $B_{\rm{}pos}$ based on the celestial positions of its detections.
+
+The detections from a real source are all connected, they are just displaced by a random astrometric error, but noise peaks (ghosts) will be independent of each other and their associations can only be by chance.
+As we are working under the approximation that the flux and sky position estimates are independent (see Eq.~\ref{eq:eplike}), the Bayes factor using both the photometric and astrometric information factors,
+%
+\begin{equation}
+B_{\rm{}flux,pos} = B_{\rm{}flux}\cdot{}B_{\rm{}pos}.
+\end{equation}
+%
+The astrometric cross-match Bayes factor, $B_{\rm{}pos}$, has been derived in \ref{XX} (see Eq.~(17) there, and Eq.~(19) for the high-precision, tangent plane Gaussian limit).
+That work also discusses generalizations that account for proper motion and other complications.
+
+In the following section we assess the discriminative power of multi-epoch source detection by applying it to simulated galaxies and noise peaks, both omitting and including the astrometric data.
+
+
+
+%================================================================================
+%\section{Caveats}
+%\label{sec:caveats}
+
+
+%================================================================================
+\section{Simulations}
+\label{sec:disc}
+
+\noindent
+We here use simulations to demonstrate the detection capability of our multi-epoch approach in a setting with known ground truth.
+The simulation parameters were chosen to produce data similar to that provided in modern large-scale optical surveys.
+
+
+%--------------------------------------------------------------------------------
+\subsection{Simulated Galaxies}
+\noindent
+We assume that galaxies are brighter than 28 magnitudes and the 5$\sigma$ detection limit is 24 magnitudes, corresponding roughly to parameters of LSST photometry.
+%
+Panel~(b) of Figure~\ref{fig:frac} shows the fraction of noise peak detection probability as a function of magnitude with these parameters, in contrast to the dimensionless presentation in panel~(a).
+%
+To compute the marginal likelihood for the source-present hypothesis, we must specify a prior for the source flux, $\flux$.
+Here we use a standard faint-galaxy number counts law,
+with the number counts following the empirical formula of 
+\mbox{$dN\!\propto\!10^{0.4m}dm$}; see \citep{MT00-NumCounts}. 
+That approximately translates to the properly normalized population distribution of
+%
+\begin{equation} 
+\label{eq:ref3}
+\pi(f) = \left\{\begin{array}{l l}
+           f_L/f^2  & \quad \mbox{if\ $f > f_L$}\\
+           0 & \quad \mbox{otherwise}
+           \\ \end{array} \right.
+\end{equation}
+%
+where $f_L$ is the limiting flux that corresponds to previously defined magnitude limit.
+
+%\subsection{The Mock Catalogs}\label{sec:mock} \noindent
+We generate sets of random detections for 20,000 galaxies with true fluxes between 28 and 23 magnitudes by simply drawing $\fest_\eind$ values from a Gaussian centered on the actual fluxes.
+%
+We also generate 2,000 ghost detection $\fest_\eind$ values from $\npd(\fest)$ by inverting the cumulative distribution (computed numerically on a grid).
+%
+The number of exposures is set to the previously used $k=9$ with a flux threshold of just 1$\sigma$, deep in the noise.
+In observations with our specified parameters, the number of ghost detections will greatly outnumber the galaxy detections with this low threshold.
+The numbers of galaxies and ghosts were chosen to be able to display the distributions of Bayes factors for the two classes of detections.
+
+We first analyze the simulated data considering only the photometric information (i.e., ignoring the directional Bayes factors).
+In Figure~\ref{fig:bf} the (red) points represent the resulting Bayes factors for the real sources (right of the double dashed vertical lines) and the noise peaks (on the left).
+%
+We see that the weight of evidence is strong for the bright galaxies but weakens for the faint galaxies.
+The smallest Bayes factors arise for galaxies with true magnitudes near 26.5, which corresponds to the mode of the noise peak distribution, $\npd(\fest)$.
+Perhaps surprisingly, sources dimmer than magnitude 26.5 may have larger Bayes factors than those with magnitude 26.5.
+This happens because $\npd(\fest)$ peaks away from $\fest=0$, i.e., we do not expect noise peaks to have arbitrarily small measured fluxes.
+For the weakest detectable sources, the most likely number of detections among the $k=9$ is one.
+The flat top of the distribution at the faint end corresponds to very dim sources detected only once, very near threshold.
+The smaller Bayes factors in that region of the plot correspond to unlikely larger numbers of detections near the threshold; this produces a subtle banding in the distribution.
+
+%****************************************
+\color{red}
+We now additionally consider the astrometric data.
+Assuming a constant direction  uncertainty of $0.1\arcsec$ for all detections, we simulate the coordinates for the mock sources. Around the true direction of the object, we randomly generate points from a 2D Gaussian. The flat sky approximation is excellent: for such tight scatters, the systematic error is below the limit of the numerical representation of double precision floating point numbers.
+
+The coordinates of noise peaks are generated homogeneously.
+%
+The surface density of the ghosts is analytically calculated and its integral above the 1$\sigma$ detection threshold yields \mbox{$\nu\!=\!0.04/\square\arcsec$}.
+%
+A simple algorithm is to pick a large enough square, with area $\Omega$, and randomly draw the number of peaks from a Poisson distribution with expectation value $\lambda=\nu\Omega$. Out of these ghosts, we pick as many as the number of flux detections such that they are closest to the center, where the simulated object is placed.
+
+Figure~\ref{fig:bf2} shows the results. The quantized nature of the plot is due to the strong evidence coming from more and more matching detection, while the noise peaks scatter to lower values. The 9 levels correspond to the different number of detections with the lowest being 1, where $B_{\rm{}pos}$ is unity by definition (no constraint coming from a single detection), which leaves the previous results untouched.
+
+
+
+\begin{figure}
+\epsscale{1.2}
+\plotone{fig/f7u-U.png}
+\caption{The (red) points represent the weight of evidence for simulated galaxies as a function of their true brightness and the same for generated random noise peaks. The Bayes factor is high for the bright galaxies but its logarithm is close to zero for the faint ones. The noise peaks (left of double lines) seem to separate slightly from the faintest sources (just right of the double dashed vertical lines) because the fluxes in noise peaks tend to be higher, which better mimics sources between 26 and 25 magnitudes.}
+\label{fig:bf}
+\end{figure}
+
+\begin{figure}
+\epsscale{1.2}
+\plotone{fig/f8u-U.png}
+\caption{The Bayes factor can differentiate significantly better between real objects and noise peaks when we include astrometric information. Here we plot logarithm of product of the photometric and astrometric Bayes factors, the latter which comes directly from the cross-identification based on the celestial coordinates, see text for details.}
+\label{fig:bf2}
+\end{figure}
+
+
+%--------------------------------------------------------------------------------
+\iffalse
+\subsection{Mixed Detections of Object and Noise}
+\label{sec:mix}
+\noindent
+The faintest sources rarely pop above the threshold, which makes them apparently more distiguishable from the noise, as seen previously in Figure~\ref{fig:bf}. This is a real effect due to the fact that the noise peaks tend to be higher flux; see details in the Appendix. In a real survey, candidate associations of faint sources are expected to be contaminated  by noise peaks. To deal with this, we can  extend our model to include a label parameter $v_i$ for each detection, which takes the value of, say, 1 if the detection is from the object, and 0 if it is a ghost.
+%
+Formally this is similar to sorting the measurements into correct and incorrect classes for robust measurements, as discussed by \citet{press}.
+%
+The likelihood is a product of the two possibilities, which is a function of the set of labels $\apjvec{v}$ and the flux.
+%
+\begin{equation}
+L(\apjvec{v},f)= (1\!-\!P_f)^{k\!-\!n} \prod_{v_i=1}\!G(f_i;f,\sigma^2) \prod_{v_i=0}\!(1\!-\!P_f)\,N(f_i;\sigma^2)
+\end{equation}
+%
+If $\beta$ represents the probability that a detection belongs to the object, the conditional probability of $\apjvec{v}$ is
+%
+\begin{equation}
+\pi(\apjvec{v}|\beta) = \prod_{v_i=1}\!\beta \prod_{v_i=0}\!(1\!-\!\beta)
+\end{equation}
+%
+Not knowing the value of $\beta$ we can assume its prior to be flat on the [0,1] interval to derive the posterior probability, which can be marginalized to find the best labels. Also we can perform the full integration over all parameters to use for hypothesis testing.
+%
+\begin{eqnarray}
+L_{\text{mix}} & = & \int_0^1\!\!d\beta \int\!\!df\,\pi(f)\ (1\!-\!P_f)^{k\!-\!n} \ \times\\
+ & \times & \sum_{\apjvec{v}}\prod_{v_i=1}\!\beta G(f_i;f,\sigma^2) \prod_{v_i=0}\!(1\!-\!\beta)(1\!-\!P_f)\,N(f_i;\sigma^2) \nonumber \\
+ & = & \int_0^1\!\!d\beta \int\!\!df\ \pi(f)\ (1\!-\!P_f)^{k\!-\!n}  \ \times \\
+ & \times & \prod_i \Big[\beta G(f_i;f,\sigma^2) + (1\!-\!\beta)(1\!-\!P_f)\,N(f_i;\sigma^2) \Big] \nonumber
+\end{eqnarray}
+%
+In confused fields this can be further extended to include the possiblity of multiple objects \citep{loredo}.
+
+
+%--------------------------------------------------------------------------------
+\subsection{Variable Objects}
+\label{sec:var}
+\noindent
+While the analysis here considered only sources with constant brightness, the methodology is expected to perform well on variables. If the brightening is a one-time transient such as a supernova, the significance comes from the measured flux providing enough evidence for keeping the detections.
+%
+If, on the other hand, the variables are repeatedly detected, the cross-identification term will quickly grow to high values. The details of such algorithms will need to be optimized with the observation cadence and the expected frequency of these sources, hence here we just provide the general mathematical formulas.
+%
+A model that describes the evolution of the flux is parameterized by some $\theta$ variables, such that $g(t;\theta)$ provides the prediction of the true flux as a function of time. Examples include models for supernova lightcurves empirical or theoretical \citep{riess95,snana}. The $\pi(\theta)$ distribution is either known apriori or can be inferred simultaneously in a 2-level hierarchical model.
+%
+Let $i$ index the epochs at which we detect the $f_i$ fluxes, and $j$ reprensent the remaining $m$ exposures where nothing is seen.
+%
+Similarly to the constant flux model we can formulate the likelihood function that will also depend on the epochs now. The probability of detecting a variable object at $t_j$ time having
+\mbox{$g_j(\theta)\equiv{}g(t_j;\theta)$} flux is the integral above the threshold, $P_{g_j(\theta)}$, cf.\ Eq.(\ref{eq:pf}), and the likelihood of  $\theta$ is
+%
+\begin{equation}
+L(\theta) = \prod_j^{k-n} \left[1\!-\!P_{g_j(\theta)}\right]\,\prod_i^n G\big(f_i;g_i(\theta),\sigma^2\big)
+\end{equation}
+%
+The likehood of the hypothesis is given by marginalizing over all parameters,
+%
+\begin{equation}
+L_{\rm{}var} = \int{}\!\!d\theta\,\pi(\theta)\,L(\theta)
+\end{equation}
+%
+which can be compared to the noise or constant flux hypotheses.
+%
+We note that the latter is a special case of this generalization.
+If we simply assume that there is no time-dependence and \mbox{$g(t;\theta)\!=\!\theta$} then we get the same formulas with \mbox{$\theta\!\equiv{}\!f$}.
+
+Periodic objects fall in a special case where time is folded onto a fix interval, say between 0 and 1. With $\omega$ frequency and $\phi$ phase broken out from the general $\theta$ parameters, i.e., \mbox{$\theta\!=\!(\omega,\phi,\theta')$}, the time-dependence has the specific form of
+%
+\begin{equation}
+g(t;\omega,\phi,\theta') = h(x;\theta')
+\end{equation}
+with
+\begin{equation}
+x = \frac{ (\omega{}t+\phi)\,{\rm{}mod}\,{2\pi} }{2\pi}
+\end{equation}
+%
+where $h(\cdot)$ describes the shape of the periodic signal, parameterized by $\theta'$, which repeats indefinitely.
+%
+For example, \citet{gregory} approximate the shape with piecewise constants in $m$ bins, where $m$ is also a variable, and develop an elegant method for detecting periodic signals.
+%
+They discuss the invariance argument that formally yields the priors
+\begin{eqnarray}
+\pi(\phi) & = & 1 \big/ 2\pi \\
+\pi(\omega)& \propto & 1 \big/ \omega
+\end{eqnarray}
+on the new parameters.
+%
+The non-uniform prior on the frequency can be shown to be the natural choice that is also form-invariant with respect to re-parametrization in terms of the period; see \citet{gregory} and references therein.
+
+\fi
+
+%================================================================================
+\section{Summary}
+\label{sec:sum}
+\noindent
+In this paper we explored new approaches to processing a series of exposures with special focus on the faintest sources, where most of the new discoveries are expected.
+%
+We found that one can recover sources just by collecting a number of detections above even a low threshold with the same probability as if the sources were extracted from coadded images. Consequently we can develop incremental algorithms that crossmatch the detections and weed out the noise on the fly from a master source catalog.
+
+We derived the spatial properties of noise peaks that commonly appear in catalogs. The surface density of these ghosts is asymmetric and skewed toward positive flux values but can be accurately approximated by a shifted Gaussian for most practical purposes. We used our analytic results to perform Bayesian hypothesis testing to distinguish between true sources and noise peaks.
+%
+Based on the Bayes factor, the bright sources over \mbox{3$\sigma$} \mbox{($m\!\simeq\!24.55$)} start to separate out from the noise peaks, which becomes with very convincing evidence at \mbox{5$\sigma$} (24 mags).
+%
+Just based on the flux measurements, the faint sources are practically indistinguishable from the noise peaks but their celestial coordinates can help to correctly identify them as real sources. Using probabilistic cross-identification is to our direct benefit directly providing the required quantities. For best results we combine the brightness and spatial information in a probabilistic manner by multiplying the Bayes factors.
+
+In general, the specificity and the selectivity of the proposed discriminator depends on a number of parameters most of which we discussed as part of the simulated case study. The pixel size, the detection limit, the number of exposures and the point-spread function will determine the frequency of noise peaks as well as the statistics of the real sources based on which one can come up with reliable thresholds for progressively weeding out noise from the catalogs throughout the lifetime of a survey.
+
+
+
+\iffalse
+\begin{figure}
+\epsscale{1.2}
+\plotone{fig/f9.png}
+\caption{The Bayes factor increases for the simulate noise peaks as we increase their surface density. These simulations illustrate that effect for 1$\times$, 2$\times$, ..., and 5$\times$ the original density used in Figure~\ref{fig:bf2}. The highest density of about 3/$\square\arcsec$ corresponds roughly to 1 peak in 9 pixels for images with 0.5\arcsec pixels, which can be considered the absolute limit.}
+\label{fig:bfx}
+\end{figure}
+\fi
+
+
+\acknowledgements{}
+The authors gratefully acknowledge valuable and inspiring discussions with Andy Connolly and Robert Lupton on various aspects of the topic. This study was supported by the ... {\color{red}funding agencies???}
+
+\color{black}
+
+
+%================================================================================
+\begin{thebibliography}{}
+
+\bibitem[Adler(1981)]{adler} Adler, R.~J.\ 1981, The Geometry of Random Fields, Chichester: Wiley, 1981,  
+
+\bibitem[Bardeen et al.(1986)]{bbks} Bardeen, J.~M., Bond, J.~R., Kaiser, N., \& Szalay, A.~S.\ 1986, \apj, 304, 15 
+
+\bibitem[Bond \& Efstathiou(1987)]{bond} Bond, J.~R., \& Efstathiou, G.\ 1987, \mnras, 226, 655
+
+\bibitem[Budav{\'a}ri \& Szalay(2008)]{pxid} Budav{\'a}ri, T., \& Szalay, A.~S.\ 2008, \apj, 679, 301
+
+\bibitem[Budav{\'a}ri(2011)]{2011ApJ...736..155B} Budav{\'a}ri, T.\ 2011, 
+\apj, 736, 155 
+
+\bibitem[Gregory \& Loredo(1992)]{gregory} Gregory, P.~C., \& Loredo, T.~J.\ 1992, \apj, 398, 146
+
+%\bibitem[Kaiser(1984)]{1984ApJ...284L...9K} Kaiser, N.\ 1984, \apjl, 284, L9 
+
+\bibitem[Kaiser(2004)]{kaiser} Kaiser, N.\ 2004, ``The Likelihood of Point Sources in Pixellated Images'', Pan-STARRS internal report, PSDC-002-010-xx
+
+% SNANA: A Public Software Package for Supernova Analysis
+\bibitem[Kessler et al.(2009)]{snana} Kessler, R., Bernstein, J.~P., Cinabro, D., et al.\ 2009, \pasp, 121, 1028 
+
+\bibitem[Loredo(2012)]{loredo} Loredo, T.~J.\ 2012, arXiv:1206.4278 
+
+\bibitem[Lund \& Rudemo(2000)]{lund} Lund, J., \& Rudemo, M.\ 2000, Biometrika, 87, 2, pp.235-249 (http://www.jstor.org/stable/2673461)
+
+\bibitem[Kerekes et al.(2010)]{pmxid} Kerekes, G., Budav{\'a}ri, T., Csabai, I., Connolly, A.~J., \& Szalay, A.~S.\ 2010, \apj, 719, 59 
+
+\bibitem[Madau \& Thompson(2000)]{MT00-NumCounts} Madau, P., \& Thompson, C.\ 2000, \apj, 534, 239 
+
+\bibitem[Press(1997)]{press} Press, W.~H.\ 1997, Unsolved Problems in Astrophysics, p.49-60, arXiv:astro-ph/9604126
+
+% Using Type IA supernova light curve shapes to measure the Hubble constant
+\bibitem[Riess et al.(1995)]{riess95} Riess, A.~G., Press, W.~H., \& Kirshner, R.~P.\ 1995, \apjl, 438, L17 
+
+\bibitem[Szalay et al.(1999)]{chisq} Szalay, A.~S., Connolly, A.~J., \& Szokoly, G.~P.\ 1999, \aj, 117, 68 
+
+
+
+
+
+\end{thebibliography}
+
+
+\appendix
+\color{blue}
+
+\section{Peaks of Two-Dimensional Random Fields}
+\noindent
+Consider a two dimensional Gauusian random field $f(\rr)$, with a known power 
+spectrum. Its gradient would be $\hh$, and the second derivative tensor $g$. 
+We would like to find out the density of peaks of this field above a certain 
+height. We will follow the procedure outlined in \citet{bbks}.
+
+We will expand the field and its gradient to second order around a peak at the 
+position $\rr_p$.
+\begin{eqnarray}
+	f(\rr) = f(\rr_p)+\frac{1}{2} g_{ij}(\rr_p) (\rr-\rr_p)_i  (\rr-\rr_p)_j\\
+	h_i(\rr) = (\rr-\rr_p)_j g_{ij}(\rr_p)
+\end{eqnarray}
+where we already use the fact that the gradient of the field at a peak is zero, 
+i.e. $h_i(\rr_p)=0$. Provided that $g$ is non-singular at $\rr_p$, we can express 
+$\rr-\rr_p$ from the second equation:
+\begin{equation}
+	\rr-\rr_p = g^{-1}(\rr_p) \hh(\rr_p).
+\end{equation}
+We can write a Dirac delta that picks all extremal points of $f$ as
+\begin{equation}
+	\delta^{(2)}(\rr-\rr_p) = |\det g(\rr)| \delta^{(2)}[\hh(\rr)].
+\end{equation}
+This expression turns a continous random field, defined at all points over our 
+two-dimensional space into a discrete point process, that of the extremal points 
+of the field,
+\begin{equation}
+	n_{\rm{}ext}(\rr) = |\det g(\rr)| \delta^{(2)}[\hh(\rr)].
+\end{equation}
+
+In order to pick the peaks of the Gaussian random field we will also need to have 
+a negative definite $g$. If we only want peaks of a certain height, we need to 
+calculate the appropriate ensemble average of this density over the constrained 
+range of the variables.
+
+We have six random variables, the field $f$, the three components of the symmetric 
+$g$ tensor, and the two components of the gradient $\hh$. The correlations can be 
+computed in a straight-forward manner, given the power spectrum of the field. The
+gradient is uncorrelated with both the field and the second derivatives, due to the
+parity of the Fourier representation. Let us denote the correlation matrix of the
+field and the Hessian by $C$, and that of the gradient as $H$. Furthermore, let us 
+define the different $k$-moments of the power spectrum characterizing the field as
+\begin{equation}
+	\sigma_n^2 = \frac{1}{(2\pi)^2} \int d^2k\, k^{2n} P(k).
+\end{equation}
+
+We can now explicitely write down the correlation matrix $C$ of 
+${\bf v} = (f,g_{11},g_{12},g_{22})$ and $H$ for $\hh= (h_1, h2)$, as
+\begin{equation}
+	 C = \left(
+		\begin{array}{cccc}
+			\sigma_0^2 & -\sigma_1^2/2 & 0 & -\sigma_1^2/2\\
+			-\sigma_1^2/2 & 3\sigma_2^2/8 & 0 & \sigma_2^2/8\\
+			  0 & 0 & \sigma_2^2/8  & 0\\
+			-\sigma_1^2/2 & \sigma_2^2/8 & 0 & 3\sigma_2^2/8
+		 \end{array}\right),
+\end{equation}
+\begin{equation}
+	 H = \left(
+		\begin{array}{cccc}
+			-\sigma_1^2/2 & 0 \\
+			0 & -\sigma_1^2/2
+		 \end{array}\right).
+\end{equation}
+With these we can write the multivariate Gaussian distribution using the inverse 
+of the correlation matrix as a product of two independent distributions
+\begin{equation}
+	dP =\exp\left(-\frac{\vv^T C^{-1}\vv}{2}\right)
+  			\frac{d^4 \vv} {(2\pi)^2|C|^{1/2}}
+		 \exp\left(-\frac{\hh^T H^{-1} \hh}{2}\right) 
+			\frac{d^2 \hh} {2\pi|H|^{1/2}}
+\end{equation}
+Before we proceed further, the second derivative tensor can more conveniently
+described with the two eigenvalues $\lambda_1,\lambda_2$ and a rotation angle 
+$\phi$, as
+\begin{eqnarray}
+	g_{11} =& \lambda_1 \cos^2\phi +\lambda_2 \sin^2\phi\\
+	g_{12} =& (\lambda_1-\lambda_2) \sin\phi \cos\phi\\
+	g_{22} =& \lambda_1 \sin^2\phi + \lambda_2 \cos^2\phi
+\end{eqnarray}
+For simplicity let us introduce the dimensionless variables 
+$x=(\lambda_1+\lambda_2)/\sigma_2$, the trace of the second derivative tensor, 
+$y=(\lambda_1-\lambda_2)/\sigma_2$, and $z = f/\sigma_0$. The Jacobian of the 
+transformation from $(f,g_{11},g_{12},g_{22})$ to $(z,x,y,\phi)$ is
+\begin{equation}
+		J = \sigma_0\sigma_2^3 y/2.  
+\end{equation} 
+Let us also introduce the dimensionless $\gamma$ and the characteristic scale 
+$R$ as
+\begin{equation}
+	\gamma = \frac{\sigma_1^2}{\sigma_0\sigma_2},
+		\qquad R^2 = \frac{\sigma_1^2}{\sigma_2^2}.
+\end{equation}
+The quadratic form containing $\vv$ in the exponent can be written with the new 
+variables as
+\begin{equation}
+	Q = v^T C^{-1} v = \left(
+		2 y^2	+\frac{x^2 + 2\gamma x z + z^2}{1-\gamma^2}\right)
+\end{equation}
+The determinants of $C$ and $H$ are 
+\begin{equation}
+	|C| = \frac{1}{64}(1-\gamma^2)\sigma_0^2\sigma_2^6,\qquad
+	|H| = \frac{1}{4} \sigma_1^2
+\end{equation}
+In these variables, the unconstrained probability distribution for 
+$(x,y,z,\phi)$ becomes
+\begin{equation}
+	dP = \frac{4y}{(2\pi)^2 \sqrt{1-\gamma^2}} \exp(-\frac{1}{2}Q) 
+		\,dx\ dy\ dz\ d\phi
+\end{equation}
+In order to properly handle the symmetries of the problem, we can assume that 
+$\lambda_1\geq\lambda_2$. Then still any $(\lambda_1,\lambda_2)$ pair can be 
+mapped onto itself by a 180 degree rotation, so the valid range of $\phi$ is 
+$(0,\pi)$.  Since none of the terms depend on $\phi$, we can integrate 
+over $\phi$, resulting in
+\begin{equation}
+	dP =  
+		 \exp\left[-\frac{x^2 + 2\gamma x z + z^2}{2(1-\gamma^2)}\right] 
+			\frac{\,dx\ dz}{2\pi \sqrt{1-\gamma^2}}
+		\left( e^{-y^2}\,2y\ dy\right)
+\end{equation}
+The constraint $\lambda_1>\lambda_2$ maps onto $0<y$. If we perform the 
+integration over $y>0$, and $x,z$ over $(-\infty,\infty)$, we get 1, as we 
+should, for the unconstrained probability for a general point.
+
+As we introduce the peak constraints, we need to first consider the impact
+on the gradient. The constrained probability distribution
+is
+\begin{equation}
+	dw_x = \exp\left(-\frac{\hh^T H^{-1} \hh}{2}\right) 
+			|\det g| \delta^{(2)}[\hh]			
+			\frac{d^2 \hh} {2\pi|H|^{1/2}}
+\end{equation}
+After integrating over $d^2\hh$ we get the extremum weight
+\begin{equation}
+	w_x = \frac{|\det g|}{2\pi|H|^{1/2}} =\frac{x^2-y^2}{4 \pi R^2}
+\end{equation}
+This will multiply the unconstrained probability for the density of extremal 
+points of the random field, 
+\begin{equation}
+		dn_{\rm{}pk}=\left[\frac{(x^2-y^2)y}{2\pi R^2} e^{-y^2}\,dy\right]
+		\exp\left[-\frac{x^2 + 2\gamma x z + z^2}{2(1-\gamma^2)}\right] 
+			\frac{\,dx\ dz}{2\pi \sqrt{1-\gamma^2}}
+\end{equation}
+For a peak both eigenvalues of the second derivative tensor must be negative. 
+In the rotated coordinates $(x,y)$, this means that $x<0$, and $0<y<-x$.
+We can easily integrate over the allowed range of $y$ next, yielding
+\begin{equation}
+	\int_0^{-x} dy\, y\/ (x^2-y^2)\, e^{-y^2} 
+		=\frac{1}{2}(x^2-1+e^{-x^2}).
+\end{equation}
+We are left with
+\begin{equation}
+	dn_{\rm{}pk} = \frac{(-1 + x^2 +e^{-x^2})}{4\pi R^2}  
+	\exp\left[-\frac{x^2 + 2 x z \gamma + z^2 }{2 (1-\gamma^2)}\right]
+	\frac{\,dx\ dz}{2\pi \sqrt{1-\gamma^2}}
+\end{equation}
+Let us introduce the function $B(x)$ as
+\begin{equation}
+	B(s,b) = \sqrt{\frac{\pi}{b}} \exp\left({\frac{s^2}{2b}}\right)
+	\left[1+ {\rm erf}\left( \frac{s}{\sqrt{2b}}\right)\right],
+\end{equation}
+Evaluating the integral over $-\infty<x\leq 0$ in Mathematica, we obtain
+\begin{equation}
+ n_{\rm{}pk}(s,\gamma)= 
+		%\exp\left(-\frac{s^2}{2\gamma^2}\right) 
+		\frac{e^{-\frac{s^2}{2\gamma^2}}}{8\pi^2R^2}
+		\Bigg[
+			(1-\gamma^2)s +[s^2 - \gamma^2 (1 + s^2)] B(s,1)
+			+B(s, 3- 2\gamma^2)
+		\Bigg]
+\end{equation}
+with
+\begin{equation}
+	s = \frac{\gamma z}{\sqrt{1-\gamma^2}}
+\end{equation}
+
+We need to evaluate the shape parameter $\gamma$. Assume that the window 
+function applied to the random field is a Gaussian with a scale $a$,
+\begin{equation}
+	w(r) = \frac{1}{2\pi a^2} \exp\left(-\frac{r^2}{2 a^2}\right).
+\end{equation}
+Its Fourier transform is also a Gaussian,
+\begin{equation}
+	W(k) = \exp\left(-\frac{k^2a^2}{2}\right).
+\end{equation}
+We model the sky noise as a white noise with a flat spectrum. Thus the
+correlations in the measured random field are determined by the window function,
+i.e.,
+\begin{equation}
+	P(k) = A\,|W(k)|^2 = A \exp\left(-k^2a^2\right)
+\end{equation}
+With this power spectrum it is trivial to compute the scale and the shape 
+parameters as
+\begin{equation}
+	\gamma^2 = \frac{1}{2}, \qquad R^2 = \frac{a^2}{2}
+\end{equation}
+
+
+\end{document}
+
+
+
