@@ -504,38 +504,7 @@ Figure~\ref{fig:bf2} shows the results. The quantized nature of the plot is due 
 \end{figure}
 
 
-%--------------------------------------------------------------------------------
-\iffalse
-\subsection{Mixed Detections of Object and Noise}
-\label{sec:mix}
-\noindent
-The faintest sources rarely pop above the threshold, which makes them apparently more distiguishable from the noise, as seen previously in Figure~\ref{fig:bf}. This is a real effect due to the fact that the noise peaks tend to be higher flux; see details in the Appendix. In a real survey, candidate associations of faint sources are expected to be contaminated  by noise peaks. To deal with this, we can  extend our model to include a label parameter $v_i$ for each detection, which takes the value of, say, 1 if the detection is from the object, and 0 if it is a ghost.
-%
-Formally this is similar to sorting the measurements into correct and incorrect classes for robust measurements, as discussed by \citet{press}.
-%
-The likelihood is a product of the two possibilities, which is a function of the set of labels $\apjvec{v}$ and the flux.
-%
-\begin{equation}
-L(\apjvec{v},f)= (1\!-\!P_f)^{k\!-\!n} \prod_{v_i=1}\!G(f_i;f,\sigma^2) \prod_{v_i=0}\!(1\!-\!P_f)\,N(f_i;\sigma^2)
-\end{equation}
-%
-If $\beta$ represents the probability that a detection belongs to the object, the conditional probability of $\apjvec{v}$ is
-%
-\begin{equation}
-\pi(\apjvec{v}|\beta) = \prod_{v_i=1}\!\beta \prod_{v_i=0}\!(1\!-\!\beta)
-\end{equation}
-%
-Not knowing the value of $\beta$ we can assume its prior to be flat on the [0,1] interval to derive the posterior probability, which can be marginalized to find the best labels. Also we can perform the full integration over all parameters to use for hypothesis testing.
-%
-\begin{eqnarray}
-L_{\text{mix}} & = & \int_0^1\!\!d\beta \int\!\!df\,\pi(f)\ (1\!-\!P_f)^{k\!-\!n} \ \times\\
- & \times & \sum_{\apjvec{v}}\prod_{v_i=1}\!\beta G(f_i;f,\sigma^2) \prod_{v_i=0}\!(1\!-\!\beta)(1\!-\!P_f)\,N(f_i;\sigma^2) \nonumber \\
- & = & \int_0^1\!\!d\beta \int\!\!df\ \pi(f)\ (1\!-\!P_f)^{k\!-\!n}  \ \times \\
- & \times & \prod_i \Big[\beta G(f_i;f,\sigma^2) + (1\!-\!\beta)(1\!-\!P_f)\,N(f_i;\sigma^2) \Big] \nonumber
-\end{eqnarray}
-%
-In confused fields this can be further extended to include the possiblity of multiple objects \citep{loredo}.
-
+% Removed "mixed detections" section here...
 
 %--------------------------------------------------------------------------------
 \subsection{Variable Objects}
@@ -607,17 +576,6 @@ Based on the Bayes factor, the bright sources over \mbox{3$\sigma$} \mbox{($m\!\
 Just based on the flux measurements, the faint sources are practically indistinguishable from the noise peaks but their celestial coordinates can help to correctly identify them as real sources. Using probabilistic cross-identification is to our direct benefit directly providing the required quantities. For best results we combine the brightness and spatial information in a probabilistic manner by multiplying the Bayes factors.
 
 In general, the specificity and the selectivity of the proposed discriminator depends on a number of parameters most of which we discussed as part of the simulated case study. The pixel size, the detection limit, the number of exposures and the point-spread function will determine the frequency of noise peaks as well as the statistics of the real sources based on which one can come up with reliable thresholds for progressively weeding out noise from the catalogs throughout the lifetime of a survey.
-
-
-
-\iffalse
-\begin{figure}
-\epsscale{1.2}
-\plotone{fig/f9.png}
-\caption{The Bayes factor increases for the simulate noise peaks as we increase their surface density. These simulations illustrate that effect for 1$\times$, 2$\times$, ..., and 5$\times$ the original density used in Figure~\ref{fig:bf2}. The highest density of about 3/$\square\arcsec$ corresponds roughly to 1 peak in 9 pixels for images with 0.5\arcsec pixels, which can be considered the absolute limit.}
-\label{fig:bfx}
-\end{figure}
-\fi
 
 
 \acknowledgements{}
