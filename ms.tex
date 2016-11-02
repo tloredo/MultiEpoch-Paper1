@@ -86,9 +86,9 @@
 %================================================================================
 \begin{document}
 
-\title{Faint Object Detection in Time-Domain Observations}
-\journalinfo{To appear in ApJ?}
-%\journalinfo{Submitted to Apj}
+\title{Faint Object Detection in Multi-Epoch Observations}
+%\journalinfo{To appear in ApJ?}
+\journalinfo{Submitted to Apj}
 
 \author{ Tam\'{a}s Budav\'{a}ri, Alexander S.\ Szalay}
 \affil{Dept.\ of Physics and Astronomy, The Johns Hopkins University, 3400 North Charles Street, Baltimore, MD 21218}
@@ -102,13 +102,13 @@
 
 \begin{abstract} 
 Observational astronomy in the time-domain era faces several new challenges. 
-One of them is the efficient use of observations at multiple epochs. 
+One of them is the efficient use of observations obtained at multiple epochs. 
 The work presented here addresses faint object detection, and seeks to find an incremental strategy for separating real objects from artifacts in ongoing surveys, in situations where the available data are summaries of the full image data, such as source flux and direction estimates (with uncertainties) reported in catalogs.
 We adopt a Bayesian approach, addressing object detection by calculating the probabilities for hypotheses asserting there is no object, or one object, in a small image patch containing at most one detected source at each epoch.
 The object-present hypothesis interprets the sources in a patch as arising from a genuine object; the no-object hypothesis interprets any detected sources as spurious, arising from noise peaks.
-We study the detection probability of constant-flux objects in a simplified Gaussian noise setting, comparing results from based on single exposures and stacks to results based on catalog summary data.
-We find that probabilistic fusion of multi-epoch catalog information can detect sources with only modest sacrifice in sensitivity.
-In the setting studied here, the detection probability factors into terms accounting for matching of the estimated fluxes of candidate sources, and accounting for matching of their estimated directions (i.e., directional cross-matching across catalogs).
+We study the detection probability for constant-flux objects in a simplified Gaussian noise setting, comparing results based on single exposures and stacked exposures to results based on catalog summary data.
+Computing the detection probability based on catalog data amounts to generalized cross-matching: it is the product of a factor accounting for matching of the estimated fluxes of candidate sources, and a factor accounting for matching of their estimated directions (i.e., directional cross-matching across catalogs).
+We find that probabilistic fusion of multi-epoch catalog information can detect sources with only modest sacrifice in sensitivity compared to stacking.
 We show that the probabilistic cross-matching underlying our approach plays an important role in maintaining detection sensitivity.
 \end{abstract}
 
@@ -527,7 +527,8 @@ In general, the specificity and the selectivity of the proposed discriminator de
 
 
 \acknowledgements{}
-The authors gratefully acknowledge valuable and inspiring discussions with Andy Connolly and Robert Lupton on various aspects of the topic. This study was supported by the ... {\color{red}funding agencies???}
+The authors gratefully acknowledge valuable and inspiring discussions with Andy Connolly and Robert Lupton on various aspects of the topic.
+This study was supported by the ... {\color{red}JHU funding agencies???} and by the NSF via grant AST-1312903.
 
 \color{black}
 
