@@ -64,12 +64,13 @@
 
 % Macro for an "editorial note"; uncomment the 2nd definition to
 % produce a version without notes (put it in main doc if desired).
-\newcommand\enote[1]{ %
+\newcommand\enote[1]{ {\color{red}%
 \marginpar[\raggedleft\large $\blacktriangleright$]%
 {\raggedright\large $\blacktriangleleft$} %
-{\large $\langle\langle\langle$}{\sl #1}{\large  $\rangle\rangle\rangle$} %
-}
+{\large $\langle\langle\langle$}{\sl #1}{\large  $\rangle\rangle\rangle$} }}
 %\renewcommand\enote[1]{\relax}
+
+\newcommand\tamas[1]{{\color{blue}#1 [Tamas]}}
 
 % Marginal note (just a redef of \marginpar or \marginparodd).
 % Uncomment the 2nd definition to produce a version without notes (put it 
@@ -131,9 +132,9 @@ Focusing on the faint objects that typically dominate the collected data is an i
 There are two different ways one can approach the problem. 
 A traditional, resource-intensive approach is to wait until all observations are completed, performing detection by stacking the multi-epoch image data (with potential complications related to registration, resampling, and point spread function matching).
 An optimal procedure for threshold-based detection with image stacks was introduced by \citet{chisq}.
-Once a master object catalog is produced from the stacked images, time-series of source measurements are created by forced photometry at the master catalog locations.
+Once a master object catalog is produced from the stacked images, time series of source measurements are created by forced photometry at the master catalog locations.
 
-An alternative (non-exclusive) approach is to perform source detection independently for each observation, producing a catalog of candidate sources at each epoch.
+An alternative (non-exclusive) approach is to perform source detection independently for each observation, producing a catalog of candidate sources at each epoch \citep{BS14-ADASS}.
 The detection threshold may be different for each epoch. 
 Interim object catalogs may be produced by analysis of the series of overlapping source detections potentially associated with a single object using any available data; a final catalog would be built using the catalogs from all epochs.
 Of course, a catalog based on data from many epochs should be able to include many dim sources that escape confident detection in single-epoch or few-epoch catalogs.
@@ -142,7 +143,10 @@ If we set the single-epoch threshold too high, there will be too few detections;
 If, on the other hand, we set the threshold too low, the single-epoch catalogs will be overwhelmed with (mostly false) detections that were seen only once, requiring wasteful expenditure of storage and computing resources for constructing multi-epoch catalogs.
 An optimal threshold might preserve the size and quality of the final catalog, while enabling users to build interim catalogs on-the-fly, potentially tailored to specific, evolving needs.
 
+\iffalse
 \enote{Maybe clarify here whether we envision this as useful to end-users, or only for survey data management teams. To me it seems we should leave open the former possibility; if so, we may not need to add anything here.}
+\tamas{I agree.}
+\fi
 
 We here address the second alternative, considering how best to accumulate evidence from possibly marginal detections while the observations are in progress, to prune spurious source detections but keep the sources associated with genuine objects.
 The study presented here is exploratory, to establish the basic ideas and provide initial metrics for studying the feasibility of the incremental approach.
@@ -272,9 +276,11 @@ For a particular stacked exposure case, we see there is a multi-epoch case whose
 For example, the $3\sigma$ stacked exposure curve is very similar to the multi-epoch $5+$ detection case.
 This indicates that collecting sources with $5+$ detections from \emph{single-epoch} $3\sigma$ catalogs is nearly equivalent in terms of catalog completeness and purity to producing a separate, new $3\sigma$ stacked exposure catalog.
 %
-\enote{Move the rest to intro? It may already be addressed there.}
+
+%\enote{Move the rest to intro? It may already be addressed there.} \tamas{I'd just leave it here...}
+
 Analyzing the single-epoch catalogs has a number of advantages.
-It can be implemented in an incremental fashion that follows the schedule of the survey and the time-series is readily available at a given time; there is no need to go back to old images and to performed forced photometry at locations that are revealed in the stacks only.
+It can be implemented in an incremental fashion that follows the schedule of the survey, and the time series data are readily available at a given time; there is no need to go back to old images and to performed forced photometry at locations that are revealed only in the final stack.
 
 \begin{figure}[t]
 \epsscale{1.2}
@@ -443,7 +449,9 @@ That work also discusses generalizations that account for proper motion and othe
 
 In the following section we assess the discriminative power of multi-epoch source detection by applying it to simulated galaxies and noise peaks, both omitting and including the astrometric data.
 
+\iffalse
 \enote{It might be interesting to show astrometry-only results. They might correspond to allowing for arbitrary variability, so that no flux matching is expected at all. Use of variability models would then produce results between the pure astrometry and astrometry $+$ flux cases.}
+\fi
 
 
 %================================================================================
@@ -576,13 +584,13 @@ The evidence for a source becomes very strong once the single-epoch fluxes excee
 %
 When considering only the flux measurements, the faintest sources are hard to distinguish from the noise peaks with measurements at just a few epochs; but astrometric data (celestial coordinate estimates) greatly help to separate genuine and spurious detections.
 
+\iffalse
 In general, the specificity and the selectivity of the proposed discriminator depends on a number of parameters, most of which we discuss as part of the simulated case study.
 The pixel size, the single-epoch detection threshold, the number of exposures, and the point-spread function all affect the frequency of noise peaks.
 The population distribution of source properties also directly impacts detectability of faint sources.
 A hierarchical generalization of the approach could learn important features of the population distribution as part of the analysis. 
-
 \enote{Not clear what this is getting at, in the previous revision:  ``as well as the statistics of the real sources based on which one can come up with reliable thresholds for progressively weeding out noise from the catalogs throughout the lifetime of a survey.''}
-
+\fi
 
 
 
@@ -613,7 +621,9 @@ Such issues, and the generalizations described above, will be topics for future 
 \acknowledgements{}
 The authors gratefully acknowledge valuable and inspiring discussions with Andy Connolly and Robert Lupton on various aspects of the topic.
 This study was supported by the ... {\color{red}JHU funding agencies???} and by the NSF via grant AST-1312903.
-
+%
+{\color{blue}
+TB acknowledges partial support from NSF Grant AST-1412566 and NASA via the awards NNG16PJ23C and STScI-49721 under NAS5-26555.}
 
 
 
@@ -632,6 +642,9 @@ This study was supported by the ... {\color{red}JHU funding agencies???} and by 
 \apj, 736, 155 
 
 \bibitem[Budav{\'a}ri(2012)]{B12-SCMAXMatch} Loredo, T.~J.\ 2012, {Statistical {Challenges} in {Modern} {Astronomy} {V}}, 303--308
+
+\bibitem[Budav{\'a}ri \& Szalay(2014)]{BS14-ADASS} Budav{\'a}ri, T., \& Szalay, A.~S.\ 2014, Astronomical Data Analysis Software and Systems XXIII, 485,
+207
 
 \bibitem[Budav{\'a}ri \& Loredo(2015)]{BL15-ARSA} Budav{\'a}ri, T., \& Loredo, T.~J.\ 2015, Annual Review of Statistics and Its Application, 2, 113--139
 
