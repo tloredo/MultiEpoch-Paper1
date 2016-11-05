@@ -110,7 +110,7 @@ We adopt a Bayesian approach, addressing object detection by calculating the mar
 The object-present hypothesis interprets the sources in a patch at different epochs as arising from a genuine object; the no-object (noise) hypothesis interprets candidate sources as spurious, arising from noise peaks.
 We study the detection probability for constant-flux objects in a simplified Gaussian noise setting, comparing results based on single exposures and stacked exposures to results based on a series of single-epoch catalog summaries.
 Computing the detection probability based on catalog data amounts to generalized cross-matching: it is the product of a factor accounting for matching of the estimated fluxes of candidate sources, and a factor accounting for matching of their estimated directions (i.e., directional cross-matching across catalogs).
-We find that probabilistic fusion of multi-epoch catalog information can detect sources with only modest sacrifice in sensitivity compared to stacking.
+We find that probabilistic fusion of multi-epoch catalog information can detect sources with only modest sacrifice in sensitivity and selectivity compared to stacking.
 The probabilistic cross-matching framework underlying our approach plays an important role in maintaining detection sensitivity, and points toward generalizations that could accomodate variability and complex object structure.
 \end{abstract}
 
@@ -501,7 +501,7 @@ In observations with our specified parameters, the number of ghost detections wi
 The numbers of galaxies and ghosts were chosen to enable display of the distributions of Bayes factors for the two classes of detections (noise and true).
 
 We first analyze the simulated data considering only the photometric information (i.e., ignoring the directional Bayes factors).
-In Figure~\ref{fig:bf} the (red) points represent the resulting Bayes factors for the real sources (right of the double dashed vertical lines) and the noise peaks (on the left).
+In Figure~\ref{fig:bf-photo} the (red) points represent the resulting Bayes factors for the real sources (right of the double dashed vertical lines) and the noise peaks (on the left).
 %
 The weight of evidence is strong for the bright galaxies but weakens for the faint galaxies.
 The smallest Bayes factors arise for galaxies with true magnitudes near 26.5, which corresponds to the mode of the noise peak distribution, $\npd(\fest)$.
@@ -525,7 +525,12 @@ The surface density of the ghosts is analytically calculated and its integral ab
 A simple algorithm is to pick a large enough square, with area $\Omega$, and randomly draw the number of peaks from a Poisson distribution with expectation value $\lambda=\nu\Omega$.
 Out of these ghosts, we pick a number equal to the number of flux detections, with locations such that are closest to the center, where the simulated object is placed.
 
-Figure~\ref{fig:bf2} shows the distribution of Bayes factors, for the real (mock) and noise sources, now including the astrometric cross-matching factor.
+Figure~\ref{fig:bf-astro} shows the distribution of astrometric Bayes factors, for the real (mock) and noise sources.
+Note the larger span of the (log) Bayes factor axis.
+Comparing to Figure~\ref{fig:bf-photo}, we see that directional cross-matching is a stronger discriminant between real and noise sources in the dim source regime.
+The photometric data grow in importance as sources grow brighter.
+
+Figure~\ref{fig:bf-both} shows the distribution of Bayes factors, for the real and noise sources, now combining the photometric and astrometric factors.
 Banding due to discreteness in the number of detections is now clearly apparent among the true-object Bayes factors; the 9 levels correspond to the different number of detections with the lowest being 1.
 For the lowest band, corresponding to a single detection, $B_{\rm{}pos}$ is unity by definition (no constraint coming from a single detection), producing the same Bayes factor distribution as in the flux-only calculation.
 For multiple detections, the Bayes factors for the true sources are greatly enhanced by including astrometric information (note that the ordinate is logarithmic); just two detections produces quite strong evidence for the true-object hypothesis.
@@ -542,19 +547,31 @@ When many objects are detected, an approximate approach, plugging in empirical e
 \color{red}
 \begin{figure}
 \epsscale{1.2}
-\plotone{fig/f7u-U.png}
-\caption{The (red) points indicate the weight of evidence for simulated galaxies as a function of their true brightness and the same for generated random noise peaks.
-The Bayes factor is high for the bright galaxies but its logarithm is close to zero for the faint ones.
-The noise peaks (left of double lines) seem to separate slightly from the faintest sources (just right of the double dashed vertical lines) because the fluxes in noise peaks tend to be higher, which better mimics sources between 26 and 25 magnitudes.}
-\label{fig:bf}
+\plotone{fig/f6.png}
+\caption{Bayes factor distributions for simulated galaxies as a function of their true brightness (right axes), and the same for generated random noise peaks (left axes), using simulated photometric data (ignoring astrometric information).
+Points (red) indicate the weight of evidence, quantified via (logarithmic) Bayes factors comparing real-source and noise origins for the simulated photometric data.
+The Bayes factor is high for the bright galaxies but is close to unity (logarithm close to zero) for the faint ones.
+The Bayes factor distribution for the noise peaks (left axes) peaks below the distribution for the faintest real sources (left region of right axes) because the measured fluxes in noise peaks tend to be in a range that mimics sources between 26 and 25 magnitudes, rather than the dimmest sources.}
+\label{fig:bf-photo}
 \end{figure}
+
 
 \begin{figure}[t!]
 \epsscale{1.2}
-\plotone{fig/f8u-U.png}
-\caption{The Bayes factor can differentiate significantly better between real objects and noise peaks when we include astrometric information.
-Here we plot logarithm of product of the photometric and astrometric Bayes factors, the latter which comes directly from the cross-identification based on the celestial coordinates, see text for details.}
-\label{fig:bf2}
+\plotone{fig/f7.png}
+\caption{Bayes factor distributions as in Figure~\ref{fig:bf-photo}, but here accounting for only astrometric information, i.e., cross-identification across epochs based on the celestial coordinates estimates and uncertainties.
+Note the larger range for the Bayes factor axis.}
+\label{fig:bf-astro}
+\end{figure}
+
+
+\begin{figure}[t!]
+\epsscale{1.2}
+\plotone{fig/f8.png}
+\caption{Bayes factor distributions as in Figure~\ref{fig:bf-photo}, but accounting for both photometric and astrometric information.
+Points (red) indicate the logarithm of the product of the photometric and astrometric Bayes factors.
+The astrometric factor dominates for weak sources, and the photometric factor dominates for bright ones.}
+\label{fig:bf-both}
 \end{figure}
 
 
