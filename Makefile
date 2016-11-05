@@ -61,7 +61,7 @@ endif
 # Include $(base).bbl on the 1st 'tar' line if needed.
 # The file lists are partly found using tex_file_list.py.
 
-ARXIV_FIGS = fig/f1.png fig/f2.png fig/f3.png fig/f4.png fig/f5.png fig/f7u-U.png fig/f8u-U.png
+ARXIV_FIGS = fig/f1.png fig/f2.png fig/f3.png fig/f4.png fig/f5.png fig/f6.png fig/f7.png fig/f8.png
 # Include class and bib style files here if needed:
 ARXIV_INPUTS =
 
