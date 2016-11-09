@@ -862,20 +862,24 @@ Let us introduce the function $B(x)$ as
 \end{equation}
 Evaluating the integral over $-\infty<x\leq 0$ in Mathematica, we obtain
 \begin{equation}
- n_{\rm{}pk}(s,\gamma)= 
+ n_{\rm{}pk}(z)= 
 		%\exp\left(-\frac{s^2}{2\gamma^2}\right) 
 		\frac{e^{-\frac{s^2}{2\gamma^2}}}{8\pi^2R^2}
 		\Bigg[
 			(1-\gamma^2)s +[s^2 - \gamma^2 (1 + s^2)] B(s,1)
 			+B(s, 3- 2\gamma^2),
-		\Bigg]
+		\Bigg],
+\label{eq:npk}
 \end{equation}
 with
 \begin{equation}
 	s = \frac{\gamma z}{\sqrt{1-\gamma^2}}.
 \end{equation}
-
-We need to evaluate the shape parameter $\gamma$. Assume that the window 
+We get the full surface density of noise peaks, $\lambda$, by integrating the conditional surface density in Eq.~\ref{eq:npk} over all peak heights $z$:
+\begin{equation}
+	\lambda = \int_{-\infty}^{\infty} n_{pk}(z) dz.
+\end{equation}
+Finally, we need to evaluate the shape parameter $\gamma$. Assume that the window 
 function applied to the random field is a Gaussian with a scale $a$,
 \begin{equation}
 	w(r) = \frac{1}{2\pi a^2} \exp\left(-\frac{r^2}{2 a^2}\right).
@@ -890,12 +894,32 @@ i.e.,
 \begin{equation}
 	P(k) = A\,|W(k)|^2 = A \exp\left(-k^2a^2\right).
 \end{equation}
-With this power spectrum it is straightforward to compute the scale and the shape 
-parameters as
+With this power spectrum it is straightforward to compute the scale and the shape parameters as
 \begin{equation}
 	\gamma^2 = \frac{1}{2}, \qquad R^2 = \frac{a^2}{2}.
 \end{equation}
+With this choice of PSF and $\gamma$, we get $s=z$ in Eq.(A25).
 
+Now we are in a position to compute the probability that a noise peak is within a radius $r$ of our point of interest located at the origin. The spatial distribution of the noise peaks is described by a Poisson process with the surface density $\lambda$. 
+The cumulative probability that the peak is within a radius $r$ is given by the well-known expression
+\begin{equation}
+	P_{pk}(<r|z) = 1-\exp[-\lambda(z) r^2 \pi].
+\end{equation}
+The differential probability is given by its derivative with respect to to $r$, as 
+\begin{equation}
+ p_{pk}(r|z) = 2\pi r \lambda(z) \exp[-\lambda(z) r^2 \pi]
+\end{equation}
+Both of these probabilities are shown on Fig.~\ref{fig:pk-shift}. The differential probability starts off around the origin scaling with $r$, due to the available area (phase space for configuration).
+This in turn causes the cumulative function to rise as $r^2$, resulting in a very small probability ($<0.03$) that a noise peak will appear within a PSF scale.
+Thus we can safely ignore noise peaks as a major contributor to false detections at a significant level.
+
+\begin{figure}
+\epsscale{0.95}
+\plottwo{fig/app-fig-a3.pdf}{fig/app-fig-a4.pdf}
+\caption{The differential and cumulative probabilities of having a noise peak at or within a radius $r$, integrated over all heights. The radius is shown in units of $a$, the PSF scale.
+}
+\label{fig:pk-shift}
+\end{figure}
 
 \end{document}
 
