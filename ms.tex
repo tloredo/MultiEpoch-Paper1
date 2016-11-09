@@ -300,7 +300,7 @@ In this context, our focus is on how one can reliably distinguish noise peaks fr
 It is important to emphasize that we have more information than just the fact that a source has been detected; we also have flux measurements, at multiple epochs. 
 Our approach is motivated by Bayesian hypothesis testing, where the strength of evidence for presence of a source is quantified by the posterior probability for the source-present hypothesis, or equivalently, by the posterior odds in favor of a source being present vs.\ being absent (the odds is the ratio of probabilities for the rival hypotheses).
 The posterior odds is the product of prior odds and the data-dependent \emph{Bayes factor}.
-The prior odds depends on population properties; it may be specified a priori when there is sufficient knowledge of the population under study, or learned adaptively by using hierarchical Bayesian methods (for examples of this in the related context of cross-identification, see \cite{B12-SCMAXMatch,L12-HierXMatch}).
+The prior odds depends on population properties; it may be specified a priori when there is sufficient knowledge of the population under study, or learned adaptively by using hierarchical Bayesian methods (for examples of this in the related context of cross-identification, see \cite{B13-SCMAXMatch,L13-HierXMatch}).
 Here we focus on the Bayes factor; we will address hierarchical modeling in a follow-up paper.
 
 
@@ -502,19 +502,23 @@ The numbers of galaxies and ghosts were chosen to enable display of the distribu
 
 We first analyze the simulated data considering only the photometric information (i.e., ignoring the directional Bayes factors).
 In Figure~\ref{fig:bf-photo} the (red) points represent the resulting Bayes factors for the real sources (right of the double dashed vertical lines) and the noise peaks (on the left).
-%
-The weight of evidence is strong for the bright galaxies but weakens for the faint galaxies.
+Superficially, the Bayes factors may appear surprisingly large; even for dim sources the Bayes factors are often $\sim 10^2$, often considered strong evidence in settings where the competing hypotheses are assigned prior odds of unity.
+But here, the prior odds for a genuine association vs.\ a noise peak match are extremely small, because chance associations are likely due to the high spatial density of galaxies.
+\cite{pxid}, \cite{B13-SCMAXMatch}, and \cite{L13-HierXMatch} discuss how to compute the prior odds in various settings.
+
+Figure~\ref{fig:bf-photo} shows that, as one would expect, the weight of evidence is strong for the bright galaxies but weakens for the faint galaxies.
 The smallest Bayes factors arise for galaxies with true magnitudes near 26.5, which corresponds to the mode of the noise peak distribution, $\npd(\fest)$.
 Perhaps surprisingly, sources dimmer than magnitude 26.5 can have larger Bayes factors than those with magnitude 26.5.
-This happens because $\npd(\fest)$ peaks away from $\fest=0$, i.e., we do not expect noise peaks to have arbitrarily small measured fluxes.
+This happens because $\npd(\fest)$ peaks away from $\fest=0$, i.e., we do not expect noise peaks to have arbitrarily small measured fluxes; the peak-finding process biases the noise peak distribution away from zero flux.
 For the weakest detectable sources, the most likely number of detections among the $k=9$ epochs is one.
 The flat top of the distribution at the faint end corresponds to very dim sources detected only once, very near threshold.
 The smaller Bayes factors in that region of the plot correspond to unlikely larger numbers of detections near the threshold; the discreteness in the number of detections produces a subtle banding in the distribution.
 
-
-
-We now additionally consider the astrometric data.
-Assuming a constant direction  uncertainty of $0.1\arcsec$ for all detections, we simulate the coordinates for the mock galaxies.
+We now consider the astrometric data, by itself.
+For simplicity, we assume a constant direction uncertainty of $0.1\arcsec$ for all detections.%
+\footnote{In reality, the direction uncertainty will be roughly constant for bright sources, when estimation error is dominated by systematic uncertainty, but for dim source candidates it will grow with magnitude (i.e., as estimated flux decreases).
+This will decrease the values of Bayes factors for dim sources, but does not qualitatively impact the findings described below.\label{fn:const-sig}}
+We simulate the coordinates for the mock galaxies as follows.
 Around the true direction of each object, we randomly generate points from a 2D Gaussian.
 This flat sky approximation is excellent in this regime; for such tight scatters, the approximation error is below the limit of the numerical representation of double precision floating point numbers.
 
@@ -527,11 +531,15 @@ Out of these ghosts, we pick a number equal to the number of flux detections, wi
 
 Figure~\ref{fig:bf-astro} shows the distribution of astrometric Bayes factors, for the real (mock) and noise sources.
 Note the larger span of the (log) Bayes factor axis.
+Banding due to discreteness in the number of detections is now clearly apparent among the true-object Bayes factors; the 9 levels correspond to the different number of detections with the lowest being 1.
 Comparing to Figure~\ref{fig:bf-photo}, we see that directional cross-matching is a stronger discriminant between real and noise sources in the dim source regime.
 The photometric data grow in importance as sources grow brighter.
 
+The astrometric Bayes factors are essentially constant vs.\ magnitude for a given number of detections among the 9 epochs.
+This is a consequence of our simplifying assumption of a constant direction uncertainty.
+As noted in footnote~\ref{fn:const-sig}, in real surveys the astrometric precision decreases with increasing magnitude (decreasing flux) in the weak-source regime; this would lead to some decrease in the Bayes factors with increasing magnitude.
+
 Figure~\ref{fig:bf-both} shows the distribution of Bayes factors, for the real and noise sources, now combining the photometric and astrometric factors.
-Banding due to discreteness in the number of detections is now clearly apparent among the true-object Bayes factors; the 9 levels correspond to the different number of detections with the lowest being 1.
 For the lowest band, corresponding to a single detection, $B_{\rm{}pos}$ is unity by definition (no constraint coming from a single detection), producing the same Bayes factor distribution as in the flux-only calculation.
 For multiple detections, the Bayes factors for the true sources are greatly enhanced by including astrometric information (note that the ordinate is logarithmic); just two detections produces quite strong evidence for the true-object hypothesis.
 The Bayes factors for the noise peaks have moved to much lower values, due to the low likelihood of directional coincidences.
@@ -540,7 +548,7 @@ This computation demonstrates that flux and astrometric catalog data, combined a
 We have not addressed what threshold Bayes factor to use for producing a multi-epoch catalog, or, in Bayesian terms, how to convert Bayes factors into posterior probabilities for candidate objects.
 As noted above, when the object population density (on the sky and in flux) is known a priori, the calculation is straightforward (e.g., the prior odds will be proportional to the ratio of true object and noise peak sky densities).
 When these quantities are unknown, a possibly complicated hierarchical Bayesian calculation can jointly estimate them and the object properties.
-When many objects are detected, an approximate approach, plugging in empirical estimates of the densities based on the data, is likely to suffice, as described in \cite{B12-SCMAXMatch,L12-HierXMatch}.
+When many objects are detected, an approximate approach, plugging in empirical estimates of the densities based on the data, is likely to suffice, as described in \cite{B13-SCMAXMatch,L13-HierXMatch}.
 
 
 %****************************************
@@ -658,7 +666,7 @@ TB acknowledges partial support from NSF Grant AST-1412566 and NASA via the awar
 \bibitem[Budav{\'a}ri(2011)]{2011ApJ...736..155B} Budav{\'a}ri, T.\ 2011, 
 \apj, 736, 155 
 
-\bibitem[Budav{\'a}ri(2012)]{B12-SCMAXMatch} Loredo, T.~J.\ 2012, {Statistical {Challenges} in {Modern} {Astronomy} {V}}, 303--308
+\bibitem[Budav{\'a}ri(2013)]{B13-SCMAXMatch} Budav{\'a}ri, T.\ 2012, {Statistical {Challenges} in {Modern} {Astronomy} {V}}, 291--302
 
 \bibitem[Budav{\'a}ri \& Szalay(2014)]{BS14-ADASS} Budav{\'a}ri, T., \& Szalay, A.~S.\ 2014, Astronomical Data Analysis Software and Systems XXIII, 485,
 207
@@ -674,7 +682,7 @@ TB acknowledges partial support from NSF Grant AST-1412566 and NASA via the awar
 % SNANA: A Public Software Package for Supernova Analysis
 \bibitem[Kessler et al.(2009)]{snana} Kessler, R., Bernstein, J.~P., Cinabro, D., et al.\ 2009, \pasp, 121, 1028 
 
-\bibitem[Loredo(2012)]{L12-HierXMatch} Loredo, T.~J.\ 2012, {Statistical {Challenges} in {Modern} {Astronomy} {V}}, 303--308
+\bibitem[Loredo(2013)]{L13-HierXMatch} Loredo, T.~J.\ 2013, {Statistical {Challenges} in {Modern} {Astronomy} {V}}, 303--308
 
 \bibitem[Lund \& Rudemo(2000)]{lund} Lund, J., \& Rudemo, M.\ 2000, Biometrika, 87, 2, pp.235-249 (http://www.jstor.org/stable/2673461)
 
@@ -898,7 +906,7 @@ With this power spectrum it is straightforward to compute the scale and the shap
 \begin{equation}
 	\gamma^2 = \frac{1}{2}, \qquad R^2 = \frac{a^2}{2}.
 \end{equation}
-With this choice of PSF and $\gamma$, we get $s=z$ in Eq.(A25).
+With this choice of PSF and $\gamma$, we get $s=z$ in Eq.~\ref{eq:npk}.
 
 Now we are in a position to compute the probability that a noise peak is within a radius $r$ of our point of interest located at the origin. The spatial distribution of the noise peaks is described by a Poisson process with the surface density $\lambda$. 
 The cumulative probability that the peak is within a radius $r$ is given by the well-known expression
